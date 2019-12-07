@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "780487816738",
+    "firebase_url": "https://pogo-9e6e8.firebaseio.com",
+    "project_id": "pogo-9e6e8",
+    "storage_bucket": "pogo-9e6e8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780487816738:android:1528ef95c66e518ecb7c7b",
+        "android_client_info": {
+          "package_name": "com.example.pogo2d"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "780487816738-133crk9sf5ggebem5otpds7crtksniem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjw-OMm9q-tXwviwV1odA2Y9Wu2gDfYN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "780487816738-133crk9sf5ggebem5otpds7crtksniem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
