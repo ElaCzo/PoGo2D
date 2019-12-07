@@ -3,4 +3,6 @@
     <string name="pogo_2d">PoGo 2D</string>
     <string name="pseudo">Ton pseudo</string>
     <string name="jouer">Jouer</string>
+    <string name="mot_de_passe">mot de passe</string>
+    <string name="email">e-mail</string>
 </resources>
