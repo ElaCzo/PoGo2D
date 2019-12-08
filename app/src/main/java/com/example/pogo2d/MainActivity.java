@@ -52,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
         email.setVisibility(View.GONE);
 
 
+        jouer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn(email.getText().toString(), mdp.getText().toString());
+            }
+        });
+
         inscription.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,11 +66,6 @@ public class MainActivity extends AppCompatActivity {
                 email.setVisibility(View.VISIBLE);
                 jouer.setVisibility(View.GONE);
                 inscription.setVisibility(View.GONE);
-
-                int i = v.getId();
-                if (i == R.id.ok) {
-                    createAccount(email.getText().toString(), mdp.getText().toString());
-                }
             }
         });
 
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
                 email.setVisibility(View.GONE);
                 jouer.setVisibility(View.VISIBLE);
                 inscription.setVisibility(View.VISIBLE);
+
+                createAccount(email.getText().toString(), mdp.getText().toString());
             }
         });
     }
