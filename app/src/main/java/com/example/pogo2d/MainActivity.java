@@ -3,6 +3,7 @@ package com.example.pogo2d;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -52,10 +53,17 @@ public class MainActivity extends AppCompatActivity {
         email.setVisibility(View.GONE);
 
 
+        // regarder stocker auth firebase.
+        // recup ds autre act
+        // pattern singleton
+
         jouer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signIn(email.getText().toString(), mdp.getText().toString());
+
+                Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+                startActivity(intent);
             }
         });
 

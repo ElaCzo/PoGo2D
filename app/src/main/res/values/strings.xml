@@ -5,4 +5,5 @@
     <string name="jouer">Jouer</string>
     <string name="mot_de_passe">mot de passe</string>
     <string name="email">e-mail</string>
+    <string name="title_activity_map">Map</string>
 </resources>
