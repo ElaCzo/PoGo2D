@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     private String TAG = "auth";
-    private FirebaseAuth mAuth;
     /* EditTexts */
     EditText pseudo;
     EditText email;
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
+        Globals.getInstance().setMAuth(FirebaseAuth.getInstance());
 
         /* EditTexts */
         pseudo = findViewById(R.id.pseudo);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = Globals.getInstance().getMAuth().getCurrentUser();
         updateUI(currentUser);
     }
     // [END on_start_check_user]
@@ -109,14 +109,14 @@ public class MainActivity extends AppCompatActivity {
         //showProgressDialog();
 
         // [START create_user_with_email]
-        mAuth.createUserWithEmailAndPassword(email, password)
+        Globals.getInstance().getMAuth().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -143,14 +143,14 @@ public class MainActivity extends AppCompatActivity {
         //showProgressDialog();
 
         // [START sign_in_with_email]
-        mAuth.signInWithEmailAndPassword(email, password)
+        Globals.getInstance().getMAuth().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signOut() {
-        mAuth.signOut();
+        Globals.getInstance().getMAuth().signOut();
         updateUI(null);
     }
 
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Send verification email
         // [START send_email_verification]
-        final FirebaseUser user = mAuth.getCurrentUser();
+        final FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
         user.sendEmailVerification()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
