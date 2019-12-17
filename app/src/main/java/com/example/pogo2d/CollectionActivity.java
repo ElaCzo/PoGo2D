@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,12 +37,33 @@ public class CollectionActivity extends AppCompatActivity {
             R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu,
             R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu};
 
+    private StorageReference mStorageRef;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection);  //Définition de la vue principale
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        File localFile = File.createTempFile("images", "jpg");
+        riversRef.getFile(localFile)
+                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        // Successfully downloaded data to local file
+                        // ...
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle failed download
+                // ...
+            }
+        });
 
         /*Button ButtonConnexion = (Button) findViewById(R.id.button1);   //Appel du "button1"
         ButtonConnexion.setOnClickListener(new View.OnClickListener()      //Creation du listener sur ce bouton
