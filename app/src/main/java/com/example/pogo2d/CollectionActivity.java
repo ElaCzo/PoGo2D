@@ -29,16 +29,24 @@ public class CollectionActivity extends AppCompatActivity {
 
     private String TAG = "collection";
 
-    private static final String[] numbers = new String[] {
-            "A", "B", "C", "D", "E",
-            "F", "G", "H", "I", "J",
-            "K", "L", "M", "N", "O",
-            "P", "Q", "R", "S", "T",
-            "U", "V", "W", "X", "Y", "Z"};
+    public static String[] osNameList = {
+            "Android",
+            "iOS",
+            "Linux",
+            "MacOS",
+            "MS DOS",
+            "Symbian",
+            "Windows 10",
+            "Windows XP",
+    };
 
     private ImageView pokemonImg;
+
     private static final Integer[] items = { R.drawable.pikachu,
             R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu,
+            R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu};
+
+    public static int[] osImages = {
             R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu};
 
     @Override
@@ -61,12 +69,9 @@ public class CollectionActivity extends AppCompatActivity {
         GridView gridView = (GridView) findViewById(R.id.gridView);
         pokemonImg = (ImageView) findViewById(R.id.img);
 
-        gridView.setAdapter(new CustomGridAdapter(this, items));
-        grid.setOnItemClickListener(this);
-        ArrayAdapter<Integer> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, items);
+        gridView = (GridView) findViewById(R.id.gridView);
+        gridView.setAdapter(new CustomAdapter(this, osNameList, osImages));
 
-        gridView.setAdapter(adapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
