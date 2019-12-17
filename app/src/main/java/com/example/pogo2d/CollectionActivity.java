@@ -56,7 +56,11 @@ public class CollectionActivity extends AppCompatActivity {
         pokemonImg = (ImageView) findViewById(R.id.img);
 
         gridView = (GridView) findViewById(R.id.gridView);
-        gridView.setAdapter(new CustomAdapter(this, pkmnNames, pkmns));
+
+        Object[] list = new Object[2];
+        list[0]=pkmnNames; list[1]=pkmns;
+
+        gridView.setAdapter(new CustomAdapter(this, list));
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,

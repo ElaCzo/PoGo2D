@@ -29,13 +29,13 @@ public class CustomAdapter extends ArrayAdapter<Object> {
 
     }
 
-    /*@Override
+    @Override
     public int getCount() {
         // TODO Auto-generated method stub
         return result.length;
     }
 
-    @Override
+    /*@Override
     public Object getItem(int position) {
         // TODO Auto-generated method stub
         return position;
