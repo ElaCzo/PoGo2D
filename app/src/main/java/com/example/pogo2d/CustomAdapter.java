@@ -16,7 +16,7 @@ public class CustomAdapter extends BaseAdapter{
     Context context;
     int [] imageId;
     private static LayoutInflater inflater=null;
-    public CustomAdapter(MainActivity mainActivity, String[] osNameList, int[] osImages) {
+    public CustomAdapter(CollectionActivity mainActivity, String[] osNameList, int[] osImages) {
         // TODO Auto-generated constructor stub
         result=osNameList;
         context=mainActivity;
@@ -55,7 +55,7 @@ public class CustomAdapter extends BaseAdapter{
         Holder holder=new Holder();
         View rowView;
 
-        rowView = inflater.inflate(R.layout.activity_collection, null);
+        rowView = inflater.inflate(R.layout.item_pokemon, null);
         holder.os_text =(TextView) rowView.findViewById(R.id.nom);
         holder.os_img =(ImageView) rowView.findViewById(R.id.img);
 

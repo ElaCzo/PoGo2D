@@ -3,13 +3,10 @@ package com.example.pogo2d;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,8 +14,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -29,24 +24,15 @@ public class CollectionActivity extends AppCompatActivity {
 
     private String TAG = "collection";
 
-    public static String[] osNameList = {
-            "Android",
-            "iOS",
-            "Linux",
-            "MacOS",
-            "MS DOS",
-            "Symbian",
-            "Windows 10",
-            "Windows XP",
+    public static String[] pkmnNames = {
+            "Pikachu", "Pikachu", "Pikachu", "Pikachu",
+            "Pikachu", "Pikachu", "Pikachu", "Pikachu"
     };
 
     private ImageView pokemonImg;
 
-    private static final Integer[] items = { R.drawable.pikachu,
+    public static int[] pkmns = {
             R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu,
-            R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu};
-
-    public static int[] osImages = {
             R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu};
 
     @Override
@@ -70,8 +56,7 @@ public class CollectionActivity extends AppCompatActivity {
         pokemonImg = (ImageView) findViewById(R.id.img);
 
         gridView = (GridView) findViewById(R.id.gridView);
-        gridView.setAdapter(new CustomAdapter(this, osNameList, osImages));
-
+        gridView.setAdapter(new CustomAdapter(this, pkmnNames, pkmns));
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -81,6 +66,12 @@ public class CollectionActivity extends AppCompatActivity {
             }
         });
 
+
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////
 
         // Create a new user with a first and last name
         Map<String, Object> user = new HashMap<>();
