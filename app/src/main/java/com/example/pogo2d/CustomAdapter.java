@@ -5,28 +5,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class CustomAdapter extends BaseAdapter{
+// extends array list
+public class CustomAdapter extends ArrayAdapter<Object> {
 
     String [] result;
     Context context;
     int [] imageId;
     private static LayoutInflater inflater=null;
-    public CustomAdapter(CollectionActivity mainActivity, String[] osNameList, int[] osImages) {
-        // TODO Auto-generated constructor stub
-        result=osNameList;
-        context=mainActivity;
-        imageId=osImages;
+    // passer une list d'objets en argument
+    public CustomAdapter(CollectionActivity activity, Object[] list) {
+        super(activity, R.layout.activity_collection, list); // pas sûre du layout
+
+        result=(String[])list[0];
+        context=activity;
+        imageId=(int[]) list[1];
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
 
-    @Override
+    /*@Override
     public int getCount() {
         // TODO Auto-generated method stub
         return result.length;
@@ -42,7 +45,7 @@ public class CustomAdapter extends BaseAdapter{
     public long getItemId(int position) {
         // TODO Auto-generated method stub
         return position;
-    }
+    }*/
 
     public class Holder
     {
