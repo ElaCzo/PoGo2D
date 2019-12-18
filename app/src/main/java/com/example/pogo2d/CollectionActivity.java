@@ -16,10 +16,15 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CollectionActivity extends AppCompatActivity {
@@ -33,9 +38,7 @@ public class CollectionActivity extends AppCompatActivity {
 
     private ImageView pokemonImg;
 
-    public static int[] pkmns = {
-            R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu,
-            R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu, R.drawable.pikachu};
+    public static List<Integer> pkmns = new ArrayList<>();
 
     private StorageReference mStorageRef;
 
@@ -49,7 +52,22 @@ public class CollectionActivity extends AppCompatActivity {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        File localFile = File.createTempFile("images", "jpg");
+        File localFile = null;
+        try {
+            localFile = File.createTempFile("images", "jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+
+        StorageReference riversRef = mStorageRef.child("images/rivers.jpg");
         riversRef.getFile(localFile)
                 .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
