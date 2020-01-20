@@ -1,11 +1,7 @@
 package com.example.pogo2d;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -13,24 +9,31 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String TAG = "auth";
     /* EditTexts */
     EditText pseudo;
     EditText email;
     EditText mdp;
-
     /* Buttons */
     Button jouer;
     Button OK;
     Button inscription;
+    private String TAG = "auth";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
         /* Buttons */
         jouer = findViewById(R.id.jouer);
-        OK  = findViewById(R.id.ok);
-        inscription =  findViewById(R.id.inscription);
+        OK = findViewById(R.id.ok);
+        inscription = findViewById(R.id.inscription);
 
         OK.setVisibility(View.GONE);
         email.setVisibility(View.GONE);
@@ -61,9 +64,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signIn(email.getText().toString(), mdp.getText().toString());
-
-                Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
-                startActivity(intent);
             }
         });
 
@@ -90,15 +90,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // [START on_start_check_user]
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = Globals.getInstance().getMAuth().getCurrentUser();
-        updateUI(currentUser);
+        Globals.setMAuth(Globals.getInstance().getMAuth());
     }
-    // [END on_start_check_user]
 
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
@@ -106,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        //showProgressDialog();
-
-        // [START create_user_with_email]
         Globals.getInstance().getMAuth().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -116,22 +111,34 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
-                            updateUI(user);
+                            final FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
+                            // Add a new document with a generated ID
+
+                            Globals.getDb().collection("users")
+                                    .add(user.getDisplayName())
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            HashMap<String, Object> map = new HashMap<>();
+                                            Globals.getDb().collection("users").document(user.getDisplayName())
+                                            .set(map);
+                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error adding document", e);
+                                        }
+                                    });
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(MainActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
-
-                        // [START_EXCLUDE]
-                        //hideProgressDialog();
-                        // [END_EXCLUDE]
                     }
                 });
-        // [END create_user_with_email]
     }
 
     private void signIn(String email, String password) {
@@ -140,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        //showProgressDialog();
-
-        // [START sign_in_with_email]
         Globals.getInstance().getMAuth().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -150,30 +154,21 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
-                            updateUI(user);
+                            Globals.setMAuth(Globals.getInstance().getMAuth());
+                            Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+                            startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(MainActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
-
-                        // [START_EXCLUDE]
-                        /*if (!task.isSuccessful()) {
-                            mStatusTextView.setText(R.string.auth_failed);
-                        }*/
-                        //hideProgressDialog();
-                        // [END_EXCLUDE]
                     }
                 });
-        // [END sign_in_with_email]
     }
 
     private void signOut() {
         Globals.getInstance().getMAuth().signOut();
-        updateUI(null);
     }
 
     private void sendEmailVerification() {
@@ -181,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
         //findViewById(R.id.verifyEmailButton).setEnabled(false);
 
         // Send verification email
-        // [START send_email_verification]
         final FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
         user.sendEmailVerification()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
@@ -201,10 +195,8 @@ public class MainActivity extends AppCompatActivity {
                                     "Failed to send verification email.",
                                     Toast.LENGTH_SHORT).show();
                         }
-                        // [END_EXCLUDE]
                     }
                 });
-        // [END send_email_verification]
     }
 
     private boolean validateForm() {
@@ -228,11 +220,4 @@ public class MainActivity extends AppCompatActivity {
 
         return valid;
     }
-
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            } else {
-            }
-    }
-
 }

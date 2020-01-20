@@ -43,6 +43,8 @@ public class CollectionActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
 
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

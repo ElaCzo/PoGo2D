@@ -1,22 +1,28 @@
 package com.example.pogo2d;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Globals {
     private static Globals instance;
 
+    private static FirebaseFirestore db;
+
     // Global variable
-    private FirebaseAuth mAuth;
+    private static FirebaseAuth mAuth;
 
     // Restrict the constructor from being instantiated
-    private Globals(){}
-
-    public void setMAuth(FirebaseAuth mAuth){
-        this.mAuth=mAuth;
+    private Globals(){
+        mAuth=null;
+        db=null;
     }
 
-    public FirebaseAuth getMAuth(){
-        return this.mAuth;
+    public static void setMAuth(FirebaseAuth mAuth){
+        Globals.mAuth=mAuth;
+    }
+
+    public static FirebaseAuth getMAuth(){
+        return mAuth;
     }
 
     public static synchronized Globals getInstance(){
@@ -24,5 +30,12 @@ public class Globals {
             instance=new Globals();
         }
         return instance;
+    }
+
+    public static FirebaseFirestore getDb(){
+        if(db==null)
+            db=FirebaseFirestore.getInstance();
+
+        return db;
     }
 }
