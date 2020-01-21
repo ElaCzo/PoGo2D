@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 signIn(email.getText().toString(), mdp.getText().toString());
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
-                    Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
-                    startActivity(intent);
+
                 } else {
                     // No user is signed in
                 }
@@ -166,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             Globals.setMAuth(Globals.getInstance().getMAuth());
+
+                            Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+                            startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
