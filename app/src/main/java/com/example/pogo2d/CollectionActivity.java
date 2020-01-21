@@ -12,10 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -54,46 +58,57 @@ public class CollectionActivity extends AppCompatActivity {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        File localFile = null;
-        try {
-            localFile = File.createTempFile("images", "jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-
-        StorageReference riversRef = mStorageRef.child("images/rivers.jpg");
-        riversRef.getFile(localFile)
-                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+        db.collection(Globals.getMAuth().getCurrentUser().getDisplayName())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        // Successfully downloaded data to local file
-                        // ...
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle failed download
-                // ...
-            }
-        });
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
 
-        /*Button ButtonConnexion = (Button) findViewById(R.id.button1);   //Appel du "button1"
-        ButtonConnexion.setOnClickListener(new View.OnClickListener()      //Creation du listener sur ce bouton
-        {
-            public void onClick(View actuelView)    //au clic sur le bouton
-            {
-                Intent intent = new Intent(CollectionActivity.this, MainActivity.class);  //Lancer l'activité DisplayVue
-                startActivity(intent);    //Afficher la vue
-            }
-        });*/
+
+                                for(String clePokemon : document.getData().keySet()) {
+                                    String valPokemon = (String) document.getData().get(clePokemon);
+
+                                    StorageReference pikaRef = mStorageRef.child("images/"+valPokemon+".jpg");
+
+                                    try {
+                                        File localFile = File.createTempFile(valPokemon, "jpg");
+
+                                        pikaRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                                // Local temp file has been created
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                // Handle any errors
+                                            }
+                                        });
+
+                                    } catch (Exception e) {
+                                    }
+                                }
+
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+
 
         GridView gridView = (GridView) findViewById(R.id.gridView);
         pokemonImg = (ImageView) findViewById(R.id.img);
@@ -113,34 +128,6 @@ public class CollectionActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////
-
-        // Create a new user with a first and last name
-        Map<String, Object> user = new HashMap<>();
-        user.put("pseudo", "bla");
-        user.put("last", "Lovelace");
-        user.put("born", 1815);
-
-        // Add a new document with a generated ID
-        db.collection("utilisateur")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
     }
 
 }
