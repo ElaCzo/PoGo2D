@@ -89,10 +89,8 @@ public class CollectionActivity extends AppCompatActivity {
                                             }
                                         });
 
-                                    } catch (Exception e) {
-                                    }
+                                    } catch (Exception e) {}
                                 }
-
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());

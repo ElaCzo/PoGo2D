@@ -32,6 +32,10 @@ public class Globals {
         return instance;
     }
 
+    public static void setDB(FirebaseFirestore db){
+        Globals.db=db;
+    }
+
     public static FirebaseFirestore getDb(){
         if(db==null)
             db=FirebaseFirestore.getInstance();

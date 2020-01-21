@@ -20,8 +20,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Globals.getInstance().setMAuth(FirebaseAuth.getInstance());
 
         /* EditTexts */
         pseudo = findViewById(R.id.pseudo);
@@ -64,6 +64,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signIn(email.getText().toString(), mdp.getText().toString());
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+                    startActivity(intent);
+                } else {
+                    // No user is signed in
+                }
+
             }
         });
 
@@ -93,9 +101,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = Globals.getInstance().getMAuth().getCurrentUser();
-        Globals.setMAuth(Globals.getInstance().getMAuth());
     }
 
     private void createAccount(String email, String password) {
@@ -104,25 +109,33 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Globals.getInstance().getMAuth().createUserWithEmailAndPassword(email, password)
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            final FirebaseUser user = Globals.getInstance().getMAuth().getCurrentUser();
+                            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             // Add a new document with a generated ID
 
-                            Globals.getDb().collection("users")
-                                    .add(user.getDisplayName())
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            Globals.setDB(FirebaseFirestore.getInstance());
+
+                            Log.i("Firestore", FirebaseFirestore.getInstance().collection("users").getPath());
+
+
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("numeber", 0);
+
+                            FirebaseFirestore.getInstance().collection("users")
+                                    .document("bla")
+                                    .set(data)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void onSuccess(DocumentReference documentReference) {
+                                        public void onSuccess(Void aVoid) {
                                             HashMap<String, Object> map = new HashMap<>();
                                             Globals.getDb().collection("users").document(user.getDisplayName())
                                             .set(map);
-                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -147,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Globals.getInstance().getMAuth().signInWithEmailAndPassword(email, password)
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -155,8 +168,6 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             Globals.setMAuth(Globals.getInstance().getMAuth());
-                            Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
-                            startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
