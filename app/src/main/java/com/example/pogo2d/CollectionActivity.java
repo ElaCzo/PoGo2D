@@ -54,12 +54,19 @@ public class CollectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection);  //Définition de la vue principale
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+         Log.e("Resume dans Collection", db.toString());
 
 
-        db.collection(Globals.getMAuth().getCurrentUser().getDisplayName())
+        db.collection("blue")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -108,7 +115,7 @@ public class CollectionActivity extends AppCompatActivity {
         pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
 
 
-        GridView gridView = (GridView) findViewById(R.id.gridView);
+        /*GridView gridView = (GridView) findViewById(R.id.gridView);
         pokemonImg = (ImageView) findViewById(R.id.img);
 
         gridView = (GridView) findViewById(R.id.gridView);
@@ -124,8 +131,7 @@ public class CollectionActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),
                         ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
             }
-        });
-
+        });*/
     }
 
 }

@@ -19,7 +19,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -109,10 +108,14 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        Log.d(TAG, "1createUserWithEmail:success");
+
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "2createUserWithEmail:success");
+
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
@@ -121,21 +124,16 @@ public class MainActivity extends AppCompatActivity {
 
                             Globals.setDB(FirebaseFirestore.getInstance());
 
-                            Log.i("Firestore", FirebaseFirestore.getInstance().collection("users").getPath());
-
-
                             Map<String, Object> data = new HashMap<>();
-                            data.put("numeber", 0);
+                            data.put("number", 0);
 
                             FirebaseFirestore.getInstance().collection("users")
-                                    .document("bla")
+                                    .document(user.getEmail())
                                     .set(data)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            HashMap<String, Object> map = new HashMap<>();
-                                            Globals.getDb().collection("users").document(user.getDisplayName())
-                                            .set(map);
+                                            Log.i(TAG, "Success adding document");
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
