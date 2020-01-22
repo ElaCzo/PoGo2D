@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         /* EditTexts */
-        pseudo = findViewById(R.id.pseudo);
+        //pseudo = findViewById(R.id.pseudo);
         email = findViewById(R.id.email);
         mdp = findViewById(R.id.mdp);
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         inscription = findViewById(R.id.inscription);
 
         OK.setVisibility(View.GONE);
-        email.setVisibility(View.GONE);
+        //email.setVisibility(View.GONE);
 
 
         // regarder stocker auth firebase.
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 OK.setVisibility(View.VISIBLE);
-                email.setVisibility(View.VISIBLE);
+                //email.setVisibility(View.VISIBLE);
                 jouer.setVisibility(View.GONE);
                 inscription.setVisibility(View.GONE);
             }
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 OK.setVisibility(View.GONE);
-                email.setVisibility(View.GONE);
+                //email.setVisibility(View.GONE);
                 jouer.setVisibility(View.VISIBLE);
                 inscription.setVisibility(View.VISIBLE);
 

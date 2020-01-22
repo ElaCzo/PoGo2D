@@ -1,22 +1,21 @@
 package com.example.pogo2d;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.GridView;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -25,29 +24,20 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CollectionActivity extends AppCompatActivity {
 
-    private String TAG = "collection";
-
-    public static String[] pkmnNames = {
-            "Pikachu", "Pikachu", "Pikachu", "Pikachu",
-            "Pikachu", "Pikachu", "Pikachu", "Pikachu"
-    };
-
-    private ImageView pokemonImg;
-
     public static List<Integer> pkmns = new ArrayList<>();
-
+    public ArrayList<String> pkmnNames = new ArrayList<>();
+    private String TAG = "collection";
+    private ImageView pokemonImg;
     private StorageReference mStorageRef;
 
-
     private FirebaseFirestore db;
+
+    private GridView gridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,35 +50,91 @@ public class CollectionActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
-         Log.e("Resume dans Collection", db.toString());
+        Log.e("Resume dans Collection", db.toString());
+
+        pokemonImg = findViewById(R.id.img);
+
+        gridView = findViewById(R.id.gridView);
 
 
-        db.collection("blue")
+        db.collection("users")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getEmail())
+                .collection("pokemons")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.e("1Resume dans Collection", db.toString());
                         if (task.isSuccessful()) {
+                            Log.e("2Resume dans Collection", db.toString());
+
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
 
+                                for (String clePokemon : document.getData().keySet()) {
+                                    Log.e("3Resume dans Collection", clePokemon);
 
-                                for(String clePokemon : document.getData().keySet()) {
-                                    String valPokemon = (String) document.getData().get(clePokemon);
+                                    final String valPokemon = (String) document.getData().get(clePokemon);
 
-                                    StorageReference pikaRef = mStorageRef.child("images/"+valPokemon+".jpg");
+                                    Log.e("1) Collection", valPokemon);
 
-                                    try {
-                                        File localFile = File.createTempFile(valPokemon, "jpg");
+                                    // ImageView in your Activity
+                                    //ImageView imageView = findViewById(R.id.imageView);
 
-                                        pikaRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                    // Download directly from StorageReference using Glide
+                                    // (See MyAppGlideModule for Loader registration)
+                                    //Glide.with(this /* context */)
+                                    //       .load(storageReference)
+                                    //        .into(imageView);
+
+
+                                    Log.e("mst Collection", mStorageRef.toString());
+                                    Log.e("mst Collection", mStorageRef.getPath());
+
+                                    final StorageReference pokeRef = mStorageRef.child("pokemons/" + valPokemon + ".png");
+
+
+                                    Log.e("Val Collection", pokeRef.getPath());
+                                    Log.e("Val Collection", pokeRef.toString());
+
+
+                                    /*try {
+                                        final File localFile = File.createTempFile(valPokemon, "png");
+
+                                        pokeRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                             @Override
                                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                                // Local temp file has been created
-                                            }
+                                                Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                                                //mImageView.setImageBitmap(bitmap);
+
+                                                Log.e("4Collection", db.toString());
+*/
+                                                /*pkmns.add(localFile.toURI()); pkmns.add(R.drawable.pikachu);
+                                                pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+                                                pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+                                                pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+                                                pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+                                                pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+                                                pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
+
+
+
+                                                Object[] list = new Object[2];
+                                                list[0]=pkmnNames.toArray(); list[1]=pkmns;
+
+                                                gridView.setAdapter(new CustomAdapter(CollectionActivity.this, list));
+
+                                                gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                    public void onItemClick(AdapterView<?> parent, View v,
+                                                                            int position, long id) {
+                                                        Toast.makeText(getApplicationContext(),
+                                                                ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });*/
+ /*                                           }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception exception) {
@@ -96,7 +142,8 @@ public class CollectionActivity extends AppCompatActivity {
                                             }
                                         });
 
-                                    } catch (Exception e) {}
+                                    } catch (Exception e) {
+                                    }*/
                                 }
                             }
                         } else {
@@ -104,34 +151,6 @@ public class CollectionActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-        pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
-
-
-        /*GridView gridView = (GridView) findViewById(R.id.gridView);
-        pokemonImg = (ImageView) findViewById(R.id.img);
-
-        gridView = (GridView) findViewById(R.id.gridView);
-
-        Object[] list = new Object[2];
-        list[0]=pkmnNames; list[1]=pkmns;
-
-        gridView.setAdapter(new CustomAdapter(this, list));
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(getApplicationContext(),
-                        ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
-            }
-        });*/
     }
 
 }

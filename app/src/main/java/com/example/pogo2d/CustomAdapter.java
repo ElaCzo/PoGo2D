@@ -59,6 +59,7 @@ public class CustomAdapter extends ArrayAdapter<Object> {
         View rowView;
 
         rowView = inflater.inflate(R.layout.item_pokemon, null);
+
         holder.os_text =(TextView) rowView.findViewById(R.id.nom);
         holder.os_img =(ImageView) rowView.findViewById(R.id.img);
 
