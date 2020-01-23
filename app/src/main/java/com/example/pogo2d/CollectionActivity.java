@@ -33,11 +33,14 @@ public class CollectionActivity extends AppCompatActivity {
     public ArrayList<String> pkmnNames = new ArrayList<>();
     private String TAG = "collection";
     private ImageView pokemonImg;
+    private ImageView imgview;
     private StorageReference mStorageRef;
 
     private FirebaseFirestore db;
 
     private GridView gridView;
+
+    private int i=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +60,8 @@ public class CollectionActivity extends AppCompatActivity {
 
         pokemonImg = findViewById(R.id.img);
 
-        gridView = findViewById(R.id.gridView);
-
+        //gridView = findViewById(R.id.gridView);
+        imgview=findViewById(R.id.imageView);
 
         db.collection("users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getEmail())
@@ -84,34 +87,34 @@ public class CollectionActivity extends AppCompatActivity {
                                     // ImageView in your Activity
                                     //ImageView imageView = findViewById(R.id.imageView);
 
-                                    // Download directly from StorageReference using Glide
-                                    // (See MyAppGlideModule for Loader registration)
-                                    //Glide.with(this /* context */)
-                                    //       .load(storageReference)
-                                    //        .into(imageView);
-
 
                                     Log.e("mst Collection", mStorageRef.toString());
                                     Log.e("mst Collection", mStorageRef.getPath());
 
                                     final StorageReference pokeRef = mStorageRef.child("pokemons/" + valPokemon + ".png");
 
-
                                     Log.e("Val Collection", pokeRef.getPath());
                                     Log.e("Val Collection", pokeRef.toString());
 
-
+                                    pokeRef.getBytes(1024*1024)
+                                            .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                                @Override
+                                                public void onSuccess(byte[] bytes) {
+                                                    Bitmap img = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                                    imgview.setImageBitmap(img);
+                                                }
+                                            });
                                     /*try {
                                         final File localFile = File.createTempFile(valPokemon, "png");
 
                                         pokeRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                             @Override
                                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                                Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                                                //mImageView.setImageBitmap(bitmap);
+                                               //Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                                                //imgview.setImageBitmap(bitmap);
 
-                                                Log.e("4Collection", db.toString());
-*/
+                                                Log.e("4Collection", db.toString());*/
+
                                                 /*pkmns.add(localFile.toURI()); pkmns.add(R.drawable.pikachu);
                                                 pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
                                                 pkmns.add(R.drawable.pikachu); pkmns.add(R.drawable.pikachu);
@@ -134,11 +137,13 @@ public class CollectionActivity extends AppCompatActivity {
                                                                 ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
                                                     }
                                                 });*/
- /*                                           }
+                                            /*}
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception exception) {
                                                 // Handle any errors
+
+                                                Log.e("ErrorCollection", localFile.getAbsolutePath());
                                             }
                                         });
 
