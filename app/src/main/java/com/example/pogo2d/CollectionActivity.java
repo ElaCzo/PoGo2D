@@ -36,11 +36,6 @@ public class CollectionActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         gridView = findViewById(R.id.gridView);
 
