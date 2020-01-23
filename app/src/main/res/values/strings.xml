@@ -7,4 +7,7 @@
     <string name="email">e-mail</string>
     <string name="title_activity_map">Map</string>
     <string name="pokedex">Pokédex</string>
+    <string name="ok">Ok</string>
+    <string name="inscription">Inscription</string>
+    <string name="todo">TODO</string>
 </resources>
