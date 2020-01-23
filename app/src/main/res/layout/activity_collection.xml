@@ -10,7 +10,7 @@
     android:paddingTop="3dp"
     tools:context=".CollectionActivity">
 
-    <!--<GridView
+    <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,12 +20,6 @@
         android:gravity="center"
         android:horizontalSpacing="5dip"
         android:numColumns="auto_fit"
-        android:verticalSpacing="5dip" />-->
+        android:verticalSpacing="5dip" />
 
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:srcCompat="@tools:sample/avatars" />
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -42,6 +43,8 @@ public class CollectionActivity extends AppCompatActivity {
 
     private int i=0;
 
+    private ArrayList<Bitmap> pokeArrayList = new ArrayList();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,8 +63,22 @@ public class CollectionActivity extends AppCompatActivity {
 
         pokemonImg = findViewById(R.id.img);
 
-        //gridView = findViewById(R.id.gridView);
-        imgview=findViewById(R.id.imageView);
+        gridView = findViewById(R.id.gridView);
+
+        Log.e("1Gridview ", pkmnNames.toString());
+
+        /*final StringAdapter arrayAdapter
+                = new StringAdapter(CollectionActivity.this,
+                android.R.layout.simple_list_item_1,
+                pkmnNames);*/
+
+
+        Object[] list = new Object[2];
+        list[0]=pkmnNames; list[1]=pokeArrayList;
+
+        gridView.setAdapter(new CustomAdapter(CollectionActivity.this, list));
+
+        Log.e("3Gridview ", pokeArrayList.toString());
 
         db.collection("users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getEmail())
@@ -84,10 +101,6 @@ public class CollectionActivity extends AppCompatActivity {
 
                                     Log.e("1) Collection", valPokemon);
 
-                                    // ImageView in your Activity
-                                    //ImageView imageView = findViewById(R.id.imageView);
-
-
                                     Log.e("mst Collection", mStorageRef.toString());
                                     Log.e("mst Collection", mStorageRef.getPath());
 
@@ -101,7 +114,10 @@ public class CollectionActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(byte[] bytes) {
                                                     Bitmap img = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                                    imgview.setImageBitmap(img);
+                                                    //pokeArrayList.add(img);
+                                                    pkmnNames.add(valPokemon);
+                                                    //((ArrayAdapter)gridView.getAdapter()).notifyDataSetChanged();
+                                                    //imgview.setImageBitmap(img);
                                                 }
                                             });
                                     /*try {
@@ -151,11 +167,42 @@ public class CollectionActivity extends AppCompatActivity {
                                     }*/
                                 }
                             }
+
+
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
+
+        //Bitmap[] pokeBitmap = (Bitmap[])pokeArrayList.toArray();
+
+ /*       String [] pokeNames = new String[pkmnNames.size()];
+
+        Log.e("1Gridview ", pkmnNames.toString());
+
+        pokeNames = pkmnNames.toArray(pokeNames);
+
+        Log.e("2Gridview ", pokeNames.toString());
+
+        ArrayAdapter<Bitmap> arrayAdapter
+                = new ArrayAdapter(this, android.R.layout.simple_list_item_1 , pokeNames);
+
+        Log.e("3Gridview ", arrayAdapter.toString());
+
+        gridView.setAdapter(arrayAdapter);*/
+
+        // When the user clicks on the GridItem
+        /*gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+                Object o = gridView.getItemAtPosition(position);
+                Website website = (Website) o;
+                Toast.makeText(MainActivity.this, "Selected :" + " " + website.getName()+"\n("+ website.getUrl()+")",
+                        Toast.LENGTH_LONG).show();
+            }
+        });*/
     }
 
 }
