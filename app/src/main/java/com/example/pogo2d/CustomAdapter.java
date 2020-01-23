@@ -16,55 +16,37 @@ import java.util.ArrayList;
 // extends array list
 public class CustomAdapter extends ArrayAdapter<Object> {
 
+    private static LayoutInflater inflater = null;
     ArrayList<String> result;
     Context context;
     ArrayList<Bitmap> imageBitmap;
-    private static LayoutInflater inflater=null;
-    // passer une list d'objets en argument
+
     public CustomAdapter(CollectionActivity activity, Object[] list) {
         super(activity, R.layout.activity_collection, list);
 
-        result=(ArrayList<String>)list[0];
-        context=activity;
-        imageBitmap=(ArrayList<Bitmap>) list[1];
-        inflater = ( LayoutInflater )context.
+        result = (ArrayList<String>) list[0];
+        context = activity;
+        imageBitmap = (ArrayList<Bitmap>) list[1];
+        inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
         return result.size();
     }
 
-    /*@Override
-    public Object getItem(int position) {
-        // TODO Auto-generated method stub
-        return position;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        // TODO Auto-generated method stub
-        return position;
-    }*/
-
-    public class Holder
-    {
-        TextView os_text;
-        ImageView os_img;
-    }
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
-        Holder holder=new Holder();
+        Holder holder = new Holder();
         View rowView;
 
         rowView = inflater.inflate(R.layout.item_pokemon, null);
 
-        holder.os_text =(TextView) rowView.findViewById(R.id.nom);
-        holder.os_img =(ImageView) rowView.findViewById(R.id.img);
+        holder.os_text = (TextView) rowView.findViewById(R.id.nom);
+        holder.os_img = (ImageView) rowView.findViewById(R.id.img);
 
         holder.os_text.setText(result.get(position));
         holder.os_img.setImageBitmap(imageBitmap.get(position));
@@ -73,12 +55,15 @@ public class CustomAdapter extends ArrayAdapter<Object> {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Toast.makeText(context, "You Clicked "+result.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "You Clicked " + result.get(position), Toast.LENGTH_SHORT).show();
             }
         });
 
         return rowView;
     }
 
+    public class Holder {
+        TextView os_text;
+        ImageView os_img;
+    }
 }
