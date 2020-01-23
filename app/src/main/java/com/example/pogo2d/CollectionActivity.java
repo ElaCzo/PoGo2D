@@ -66,10 +66,20 @@ public class CollectionActivity extends AppCompatActivity {
                                             .addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                                 @Override
                                                 public void onSuccess(byte[] bytes) {
-                                                    Bitmap img = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                                    Bitmap img = BitmapFactory
+                                                            .decodeByteArray(bytes,
+                                                                    0,
+                                                                    bytes.length);
+                                                    img=Bitmap
+                                                            .createScaledBitmap(img,
+                                                                    img.getWidth()*3,
+                                                                    img.getHeight()*3,
+                                                                    false);
                                                     pkmnNames.add(valPokemon);
                                                     pokeArrayList.add(img);
-                                                    ((CustomAdapter)gridView.getAdapter()).notifyDataSetChanged();
+                                                    ((CustomAdapter)gridView
+                                                            .getAdapter())
+                                                            .notifyDataSetChanged();
                                                 }
                                             });
                                 }

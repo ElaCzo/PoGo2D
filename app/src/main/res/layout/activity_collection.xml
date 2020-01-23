@@ -39,7 +39,7 @@
                 android:layout_alignParentStart="true"
                 android:columnWidth="120dp"
                 android:gravity="center"
-                android:horizontalSpacing="5dip"
+                android:horizontalSpacing="20dip"
                 android:numColumns="auto_fit"
                 android:verticalSpacing="5dip"/>
 
