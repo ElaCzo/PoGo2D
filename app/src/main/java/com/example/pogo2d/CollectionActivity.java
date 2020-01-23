@@ -73,6 +73,8 @@ public class CollectionActivity extends AppCompatActivity {
                                                 public void onSuccess(byte[] bytes) {
                                                     Bitmap img = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                                                     pkmnNames.add(valPokemon);
+                                                    pokeArrayList.add(img);
+                                                    ((CustomAdapter)gridView.getAdapter()).notifyDataSetChanged();
                                                 }
                                             });
                                 }
