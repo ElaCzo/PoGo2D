@@ -1,5 +1,6 @@
 package com.example.pogo2d;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -114,14 +115,19 @@ public class CollectionActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.pokedex_id:
                 // User chose the "Settings" item, show the app settings UI...
+                intent = new Intent(this, CollectionActivity.class);
+                this.startActivity(intent);
                 return true;
 
             case R.id.carte_id:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
+                intent = new Intent(this, MapActivity.class);
+                this.startActivity(intent);
                 return true;
 
             default:
