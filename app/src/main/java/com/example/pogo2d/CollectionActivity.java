@@ -4,9 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.GridView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,11 +31,15 @@ public class CollectionActivity extends AppCompatActivity {
     private GridView gridView;
     private ArrayList<String> pkmnNames = new ArrayList<>();
     private ArrayList<Bitmap> pokeArrayList = new ArrayList();
+    private Toolbar myToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection);
+
+        myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
 
         db = FirebaseFirestore.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -70,14 +77,14 @@ public class CollectionActivity extends AppCompatActivity {
                                                             .decodeByteArray(bytes,
                                                                     0,
                                                                     bytes.length);
-                                                    img=Bitmap
+                                                    img = Bitmap
                                                             .createScaledBitmap(img,
-                                                                    img.getWidth()*3,
-                                                                    img.getHeight()*3,
+                                                                    img.getWidth() * 3,
+                                                                    img.getHeight() * 3,
                                                                     false);
                                                     pkmnNames.add(valPokemon);
                                                     pokeArrayList.add(img);
-                                                    ((CustomAdapter)gridView
+                                                    ((CustomAdapter) gridView
                                                             .getAdapter())
                                                             .notifyDataSetChanged();
                                                 }
@@ -92,4 +99,23 @@ public class CollectionActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.pokedex_id:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.carte_id:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
 }

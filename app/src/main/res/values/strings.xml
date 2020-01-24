@@ -10,4 +10,6 @@
     <string name="ok">Ok</string>
     <string name="inscription">Inscription</string>
     <string name="todo">TODO</string>
+    <string name="carte_title">Carte</string>
+    <string name="pokedex_title">Pokédex</string>
 </resources>
