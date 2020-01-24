@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 
@@ -97,6 +98,18 @@ public class CollectionActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+
+        //MenuItem carteItem = menu.findItem(R.id.carte_id);
+        //SearchView searchView =
+        //        (SearchView) searchItem.getActionView();
+
+        // Configure the search info and add any event listeners...
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
