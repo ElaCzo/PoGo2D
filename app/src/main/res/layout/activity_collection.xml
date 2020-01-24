@@ -9,51 +9,38 @@
     android:paddingBottom="3dp"
     tools:context=".CollectionActivity">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/pokedex"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dip"
+        android:layout_marginBottom="10dip"
+        android:fontFamily="casual"
+        android:text="@string/pokedex"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textStyle="bold" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pokedex"
+        android:layout_alignParentStart="true"
+        android:columnWidth="120dp"
+        android:gravity="center"
+        android:horizontalSpacing="20dip"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="5dip" />
 
-            <TextView
-                android:id="@+id/pokedex"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dip"
-                android:layout_marginBottom="10dip"
-                android:fontFamily="casual"
-                android:text="@string/pokedex"
-                android:textAlignment="center"
-                android:textSize="30sp"
-                android:textStyle="bold" />
-
-            <GridView
-                android:id="@+id/gridView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/pokedex"
-                android:layout_alignParentStart="true"
-                android:columnWidth="120dp"
-                android:gravity="center"
-                android:horizontalSpacing="20dip"
-                android:numColumns="auto_fit"
-                android:verticalSpacing="5dip"/>
-
-        </RelativeLayout>
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/gridView"
-            android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme" />
-
-    </LinearLayout>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>
+
