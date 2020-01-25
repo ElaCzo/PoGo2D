@@ -106,10 +106,6 @@ public class CollectionActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
 
-        //MenuItem carteItem = menu.findItem(R.id.carte_id);
-        //SearchView searchView =
-        //        (SearchView) searchItem.getActionView();
-
         // Configure the search info and add any event listeners...
         return super.onCreateOptionsMenu(menu);
     }
@@ -129,6 +125,12 @@ public class CollectionActivity extends AppCompatActivity {
                 // as a favorite...
                 intent = new Intent(this, MapActivity.class);
                 this.startActivity(intent);
+                return true;
+
+            case R.id.logout_id:
+                    FirebaseAuth.getInstance().signOut();
+                    intent = new Intent(this, MainActivity.class);
+                    this.startActivity(intent);
                 return true;
 
             default:
