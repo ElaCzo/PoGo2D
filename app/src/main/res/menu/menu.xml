@@ -9,11 +9,16 @@
         android:icon="@drawable/map"
         android:title="@string/carte_title" />
 
-    <!-- Settings, should always be in the overflow -->
     <item
         android:id="@+id/pokedex_id"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/menu_book"
+        android:icon="@drawable/collection"
+        android:title="@string/pokedex_title" />
+
+    <item
+        android:id="@+id/logout_id"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/power"
         android:title="@string/pokedex_title" />
 
 </menu>
