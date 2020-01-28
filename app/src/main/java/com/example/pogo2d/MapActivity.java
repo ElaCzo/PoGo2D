@@ -35,7 +35,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
-    private Location mLastKnownLocation;
+    private Location mLastKnownLocation; /* Location android.Location.location à vérif sinon
+    suppr l'import et essayer un autre */
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
     private static final String TAG = MapActivity.class.getSimpleName();
@@ -119,7 +120,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         updateLocationUI();
 
         // Get the current location of the device and set the position of the map.
-        //getDeviceLocation();
+        getDeviceLocation();
     }
 
     private void updateLocationUI() {
