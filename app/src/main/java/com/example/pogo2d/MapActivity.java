@@ -28,6 +28,7 @@ import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -173,9 +174,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                             Log.e("locate ", locatedPokemons.size() + "");
 
-                            addSashaOnMap(1.4);
-                            addPokemonsOnMap(1.4);
-                            //.snippet(getString(R.string.default_info_snippet)));
+                            addSashaOnMap(1.6);
+                            addPokemonsOnMap(1.6);
+
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -194,27 +195,66 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             Location location,
             int nombre,
             double range) {
+
         ArrayList<LocatedPokemon> pokemons = new ArrayList<>();
+        ArrayList<LatLng> points = new ArrayList<>();
+
+        int nombrePokeExistants = Pokemon.getPokemons().size();
+
+
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
 
-        int nombrePokeExistants = Pokemon.getPokemons().size();
-        Log.d("**MAP** nb poké: ", "" + nombrePokeExistants);
-
         for (int i = 0; i < nombre; i++) {
-
             int alea = (int) (Math.random() * nombrePokeExistants);
+            LatLng ll = computeRandomInRangeWhichDoesntAlreadyExist(range, points, location);
 
-            double newLatitude = computeRandomInRange(latitude, range);
-            double newLongitude = computeRandomInRange(longitude, range);
+            /*final double newLatitude = computeRandomInRange(latitude, range);
+            final double newLongitude = computeRandomInRange(longitude, range);
 
-            pokemons.add(new LocatedPokemon(alea,
-                    newLatitude,
-                    newLongitude));
+            LatLng ll = new LatLng(newLatitude, newLongitude);*/
+
+            points.add(ll);
+
+            pokemons.add(new LocatedPokemon(
+                    alea,
+                    ll.latitude,
+                    ll.longitude));
         }
 
         return pokemons;
     }
+
+
+    private LatLng computeRandomInRangeWhichDoesntAlreadyExist(
+            double range,
+            ArrayList<LatLng> points,
+            Location location) {
+
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        LatLng ll;
+        Boolean estTropPres = false;
+        do {
+            final double newLatitude = computeRandomInRange(latitude, range);
+            final double newLongitude = computeRandomInRange(longitude, range);
+
+            estTropPres = points.stream()
+                    .map(e -> {
+                        double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
+                                (newLatitude * newLatitude + newLongitude * newLongitude);
+                        Log.i("DIST POKE", dist+"");
+                        return Math.abs(dist);
+                    }).anyMatch(e-> (e < 0.1));
+
+            ll = new LatLng(newLatitude, newLongitude);
+        } while (estTropPres);
+
+        return ll;
+
+    }
+
 
     private double computeRandomInRange(double n, double range) {
         return (n - range) + (Math.random() * (2. * range));
