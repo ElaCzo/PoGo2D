@@ -208,8 +208,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private double computeRandomInRange(double n, double range) {
-        double alea = (n - range) + (Math.random() * (((n + range) - (n - range))));
-        return alea;
+        return (n - range) + (Math.random() * (2. * range));
     }
 
     private void addPokemonsOnMap() {

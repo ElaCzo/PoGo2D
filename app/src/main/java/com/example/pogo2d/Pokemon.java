@@ -45,14 +45,11 @@ public class Pokemon {
     private static ArrayList<Pokemon> initPokemons() {
         final ArrayList<Pokemon> res = new ArrayList<>();
 
-        Log.e("ICI ", "ça marche?");
         final Task<ListResult> task = FirebaseStorage.getInstance().getReference().child("pokemons")
                 .listAll()
                 .addOnSuccessListener(new OnSuccessListener<ListResult>() {
                     @Override
                     public void onSuccess(ListResult listResult) {
-                        Log.e("ici 2 ", listResult.getPrefixes().size() + "");
-                        Log.e("ici 3 ", listResult.getItems().size() + "");
                         for (final StorageReference prefix : listResult.getPrefixes()) {
                         }
 
@@ -63,27 +60,28 @@ public class Pokemon {
                                         new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                             @Override
                                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                                Log.e("Pok ", item.getName().substring(0, item.getName().length()-4));
-                                                res.add(new Pokemon(res.size(), item.getName().substring(0, item.getName().length()-4), localFile));
+                                                Log.i("Pokémon chargé", Pokemon.shapeNameFromStorage(item));
+                                                res.add(new Pokemon(
+                                                        res.size(),
+                                                        shapeNameFromStorage(item),
+                                                        localFile));
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
-                                        Log.e("Pokemon ", "Erreur téléchargement des pokémons");
+                                        Log.e("Pokemon ", "Erreur de téléchargement des pokémons");
                                     }
                                 });
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                Log.e("ici 4 ", "pq fail :(");
                             }
-                            Log.i("Pokemon item ", item.getPath());
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("Pokemon ", "Erreur :(");
+                        Log.e("Pokemon", "Erreur accès Stroage");
                     }
                 });
 
@@ -100,5 +98,10 @@ public class Pokemon {
 
     public File getFichier() {
         return fichier;
+    }
+
+    public static String shapeNameFromStorage(StorageReference item){
+        String nom = item.getName();
+        return (nom.charAt(0)+"").toUpperCase()+nom.substring(1, item.getName().length()-4);
     }
 }
