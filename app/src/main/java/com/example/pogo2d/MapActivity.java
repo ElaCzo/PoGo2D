@@ -167,11 +167,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
                             // Ajout des marqueurs pokémon
-                            locatedPokemons = computePokemonsOnMap(mLastKnownLocation, 3);
+                            locatedPokemons = computePokemonsOnMap(mLastKnownLocation,
+                                    3,
+                                    0.006);
 
                             Log.e("locate ", locatedPokemons.size() + "");
 
-                            addPokemonsOnMap();
+                            addSashaOnMap(1.4);
+                            addPokemonsOnMap(1.4);
                             //.snippet(getString(R.string.default_info_snippet)));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -187,7 +190,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
-    private ArrayList<LocatedPokemon> computePokemonsOnMap(Location location, int nombre) {
+    private ArrayList<LocatedPokemon> computePokemonsOnMap(
+            Location location,
+            int nombre,
+            double range) {
         ArrayList<LocatedPokemon> pokemons = new ArrayList<>();
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
@@ -199,8 +205,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
             int alea = (int) (Math.random() * nombrePokeExistants);
 
-            double newLatitude = computeRandomInRange(latitude, 0.003);
-            double newLongitude = computeRandomInRange(longitude, 0.003);
+            double newLatitude = computeRandomInRange(latitude, range);
+            double newLongitude = computeRandomInRange(longitude, range);
 
             pokemons.add(new LocatedPokemon(alea,
                     newLatitude,
@@ -214,16 +220,40 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         return (n - range) + (Math.random() * (2. * range));
     }
 
-    private void addPokemonsOnMap() {
+    private void addPokemonsOnMap(double scale) {
         for (LocatedPokemon p : locatedPokemons) {
             String cheminImageDuPokemon = p.getFichier().getAbsolutePath();
             Bitmap imageDuPokemon = BitmapFactory.decodeFile(cheminImageDuPokemon);
+            imageDuPokemon = Bitmap
+                    .createScaledBitmap(imageDuPokemon,
+                            (int) (imageDuPokemon.getWidth() * scale),
+                            (int) (imageDuPokemon.getHeight() * scale),
+                            false);
+
             mMap.addMarker(new MarkerOptions()
                     .title(p.getNom())
                     .position(new LatLng(
                             p.getLatitude(),
                             p.getLongitude()))
-            .icon(BitmapDescriptorFactory.fromPath(cheminImageDuPokemon)));
+                    .icon(BitmapDescriptorFactory.fromBitmap(imageDuPokemon)));
         }
+    }
+
+    private void addSashaOnMap(double scale) {
+        String cheminSasha = Sasha.getFichier().getAbsolutePath();
+        Bitmap imageSasha = BitmapFactory.decodeFile(cheminSasha);
+
+        imageSasha = Bitmap
+                .createScaledBitmap(imageSasha,
+                        (int) (imageSasha.getWidth() * scale),
+                        (int) (imageSasha.getHeight() * scale),
+                        false);
+
+
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(
+                        mLastKnownLocation.getLatitude(),
+                        mLastKnownLocation.getLongitude()))
+                .icon(BitmapDescriptorFactory.fromBitmap(imageSasha)));
     }
 }

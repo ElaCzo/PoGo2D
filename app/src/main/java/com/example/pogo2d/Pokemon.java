@@ -50,8 +50,6 @@ public class Pokemon {
                 .addOnSuccessListener(new OnSuccessListener<ListResult>() {
                     @Override
                     public void onSuccess(ListResult listResult) {
-                        for (final StorageReference prefix : listResult.getPrefixes()) {
-                        }
 
                         for (final StorageReference item : listResult.getItems()) {
                             try {
