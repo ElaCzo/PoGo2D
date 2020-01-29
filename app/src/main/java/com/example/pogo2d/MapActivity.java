@@ -23,12 +23,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
-import java.util.Random;
-
-import io.grpc.Context;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -168,21 +164,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
                             // Ajout des marqueurs pokémon
-                            locatedPokemons = computePokemonsOnMap(mLastKnownLocation);
+                            locatedPokemons = computePokemonsOnMap(mLastKnownLocation, 3);
 
-                            Log.e("locate ", locatedPokemons.size()+"");
+                            Log.e("locate ", locatedPokemons.size() + "");
 
-                            LatLng posPokemon = new LatLng(
-                                    mLastKnownLocation.getLatitude(),
-                                    mLastKnownLocation.getLongitude());//new LatLng(-34, 151);
-
-                            /*mMap.addMarker(new MarkerOptions()
-                                    .title(locatedPokemons.get(0).getNom())
-                                    .position(
-                                            new LatLng(
-                                                    locatedPokemons.get(0).getLatitude(),
-                                                    locatedPokemons.get(0).getLongitude())));
-                            *///.snippet(getString(R.string.default_info_snippet)));
+                            addPokemonsOnMap();
+                            //.snippet(getString(R.string.default_info_snippet)));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -197,22 +184,41 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
-    public ArrayList<LocatedPokemon> computePokemonsOnMap(Location location) {
+    private ArrayList<LocatedPokemon> computePokemonsOnMap(Location location, int nombre) {
         ArrayList<LocatedPokemon> pokemons = new ArrayList<>();
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
 
-        // récup le nombre de Pokémon actuel sur Firebase
-        int nombre = 13;
-        Log.d("**MAP** nb poké: ", ""+nombre);
+        int nombrePokeExistants = Pokemon.getPokemons().size();
+        Log.d("**MAP** nb poké: ", "" + nombrePokeExistants);
 
-        int alea = (int)(Math.random()*nombre);
+        for (int i = 0; i < nombre; i++) {
 
-        pokemons.add(new LocatedPokemon(alea,
-                latitude+Math.random(),
-                longitude+Math.random()));
+            int alea = (int) (Math.random() * nombrePokeExistants);
+
+            double newLatitude = computeRandomInRange(latitude, 0.003);
+            double newLongitude = computeRandomInRange(longitude, 0.003);
+
+            pokemons.add(new LocatedPokemon(alea,
+                    newLatitude,
+                    newLongitude));
+        }
 
         return pokemons;
     }
 
+    private double computeRandomInRange(double n, double range) {
+        double alea = (n - range) + (Math.random() * (((n + range) - (n - range))));
+        return alea;
+    }
+
+    private void addPokemonsOnMap() {
+        for (LocatedPokemon p : locatedPokemons) {
+            mMap.addMarker(new MarkerOptions()
+                    .title(p.getNom())
+                    .position(new LatLng(
+                            p.getLatitude(),
+                            p.getLongitude())));
+        }
+    }
 }
