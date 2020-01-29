@@ -1,14 +1,14 @@
 package com.example.pogo2d;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -20,26 +20,31 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.internal.impl.net.pablo.PlaceResult;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
+import com.google.firebase.storage.FirebaseStorage;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import io.grpc.Context;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int DEFAULT_ZOOM = 15;
+    private static final String TAG = MapActivity.class.getSimpleName();
+    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private GoogleMap mMap;
     private GeoDataClient mGeoDataClient;
     private PlaceDetectionClient mPlaceDetectionClient;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private boolean mLocationPermissionGranted;
-    public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation; /* Location android.Location.location à vérif sinon
     suppr l'import et essayer un autre */
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
-    private static final String TAG = MapActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +142,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -155,10 +160,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = (Location)task.getResult();
+                            mLastKnownLocation = (Location) task.getResult();
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+                            // Ajout des marqueurs pokémon
+                            computePokemonsOnMap(mLastKnownLocation);
+
+                            LatLng posPokemon = new LatLng(
+                                    mLastKnownLocation.getLatitude(),
+                                    mLastKnownLocation.getLongitude());//new LatLng(-34, 151);
+
+                            mMap.addMarker(new MarkerOptions()
+                                    .title("nom du pokémon")
+                                    .position(posPokemon));
+                            //.snippet(getString(R.string.default_info_snippet)));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -168,8 +185,27 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     }
                 });
             }
-        } catch(SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+    public ArrayList<Pokemon> computePokemonsOnMap(Location location) {
+        ArrayList<Pokemon> pokemons = new ArrayList<Pokemon>();
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        // récup le nombre de Pokémon actuel sur Firebase
+        int nombre = 13;
+        Log.d("**MAP** nb poké: ", ""+nombre);
+
+        int alea = (int)(Math.random()*nombre);
+
+        pokemons.add(new LocatedPokemon(alea,
+                latitude+Math.random(),
+                longitude+Math.random()));
+
+        return pokemons;
+    }
+
 }
