@@ -5,8 +5,7 @@ public class LocatedPokemon extends Pokemon {
     protected double longitude;
 
     public LocatedPokemon(int num, double latitude, double longitude) {
-        super();
-        this.num = num;
+        super(num);
         this.latitude = latitude;
         this.longitude = longitude;
     }

@@ -17,13 +17,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Pokemon {
-    public static ArrayList<Pokemon> pokemons = getPokemons();
-    protected String nom;
-    protected int num;
-    protected File fichier;
+    public static ArrayList<Pokemon> pokemons = initPokemons();
+    private String nom;
+    private int num;
+    private File fichier;
 
-    protected Pokemon(){
+    protected Pokemon(int num){
+        this.num=num;
+        this.nom=getPokemons().get(num).nom;
+        this.fichier=getPokemons().get(num).fichier;
+    }
 
+    public static ArrayList<Pokemon> getPokemons() {
+        return pokemons;
     }
 
     private Pokemon(int num, String nom, File fichier) {
@@ -32,7 +38,7 @@ public class Pokemon {
         this.fichier = fichier;
     }
 
-    private static ArrayList<Pokemon> getPokemons() {
+    private static ArrayList<Pokemon> initPokemons() {
         final ArrayList<Pokemon> res = new ArrayList<>();
 
         Task<ListResult> task = FirebaseStorage.getInstance().getReference().child("pokemons")
