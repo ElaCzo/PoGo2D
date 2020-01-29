@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Pokemon.init();
+
         /* EditTexts */
         email = findViewById(R.id.email);
         mdp = findViewById(R.id.mdp);

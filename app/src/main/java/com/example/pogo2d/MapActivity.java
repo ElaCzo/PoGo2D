@@ -170,17 +170,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                             // Ajout des marqueurs pokémon
                             locatedPokemons = computePokemonsOnMap(mLastKnownLocation);
 
+                            Log.e("locate ", locatedPokemons.size()+"");
+
                             LatLng posPokemon = new LatLng(
                                     mLastKnownLocation.getLatitude(),
                                     mLastKnownLocation.getLongitude());//new LatLng(-34, 151);
 
-                            mMap.addMarker(new MarkerOptions()
+                            /*mMap.addMarker(new MarkerOptions()
                                     .title(locatedPokemons.get(0).getNom())
                                     .position(
                                             new LatLng(
                                                     locatedPokemons.get(0).getLatitude(),
                                                     locatedPokemons.get(0).getLongitude())));
-                            //.snippet(getString(R.string.default_info_snippet)));
+                            *///.snippet(getString(R.string.default_info_snippet)));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
