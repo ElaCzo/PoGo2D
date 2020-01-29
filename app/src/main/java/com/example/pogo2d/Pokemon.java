@@ -83,4 +83,16 @@ public class Pokemon {
         task.getResult();
         return res;
     }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public File getFichier() {
+        return fichier;
+    }
 }

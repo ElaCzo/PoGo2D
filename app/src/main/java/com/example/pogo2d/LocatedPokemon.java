@@ -9,4 +9,12 @@ public class LocatedPokemon extends Pokemon {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
 }

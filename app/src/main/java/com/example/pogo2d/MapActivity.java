@@ -46,6 +46,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private Location mLastKnownLocation; /* Location android.Location.location à vérif sinon
     suppr l'import et essayer un autre */
 
+    private ArrayList<LocatedPokemon> locatedPokemons = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,15 +168,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
                             // Ajout des marqueurs pokémon
-                            computePokemonsOnMap(mLastKnownLocation);
+                            locatedPokemons = computePokemonsOnMap(mLastKnownLocation);
 
                             LatLng posPokemon = new LatLng(
                                     mLastKnownLocation.getLatitude(),
                                     mLastKnownLocation.getLongitude());//new LatLng(-34, 151);
 
                             mMap.addMarker(new MarkerOptions()
-                                    .title("nom du pokémon")
-                                    .position(posPokemon));
+                                    .title(locatedPokemons.get(0).getNom())
+                                    .position(
+                                            new LatLng(
+                                                    locatedPokemons.get(0).getLatitude(),
+                                                    locatedPokemons.get(0).getLongitude())));
                             //.snippet(getString(R.string.default_info_snippet)));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -190,8 +195,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
-    public ArrayList<Pokemon> computePokemonsOnMap(Location location) {
-        ArrayList<Pokemon> pokemons = new ArrayList<Pokemon>();
+    public ArrayList<LocatedPokemon> computePokemonsOnMap(Location location) {
+        ArrayList<LocatedPokemon> pokemons = new ArrayList<>();
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
 
