@@ -404,7 +404,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private void addPokemonsInAshArea(int nombre, double radius){
-        int pokemonPresents=0;
 
         int pokemonsInArea = locatedPokemons.stream()
                 .map(e -> {
@@ -416,8 +415,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                 }).reduce(0, (a1, a2) -> a1+a2);
 
+
+        // Ajout des marqueurs pokémon
+        ArrayList<LocatedPokemon> newPokemonsAdded = computePokemonsOnMap(
+                mLocation,
+                nombre-pokemonsInArea, // default : 3
+                0.01); // default : 0.006
+
+        locatedPokemons.addAll(newPokemonsAdded);
+
         // on rajoute les pokémon manquants dans la zone pour qu'elle ne soit pas vide
-        for(int i= pokemonPresents; i<nombre; i++){
+        for(int i= pokemonsInArea; i<nombre; i++){
+            // TODO !!! faire un update en fonction des marqueurs déjà présents !!
             addPokemonsOnMap(1.6);
         }
     }
