@@ -47,6 +47,7 @@ import com.google.android.libraries.places.compat.Places;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
@@ -59,7 +60,14 @@ public class MapActivity extends FragmentActivity implements
 
 
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_ZOOM = 18;
+    private static final int DEFAULT_NUMBER_OF_POKEMONS_ON_MAP = 10;
+    private static final double DEFAULT_RADIUS = 0.8;
+    private static final double DEFAULT_RANGE = 0.01;
+    private static final double DEFAULT_TOO_CLOSE = 0.1;
+    private static final double DEFAULT_CATCHING_RANGE = 0.08;
+
+
     private static final String TAG = MapActivity.class.getSimpleName();
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private GoogleMap mMap;
@@ -119,8 +127,8 @@ public class MapActivity extends FragmentActivity implements
         // setInterval(0) to get one request.
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
@@ -287,7 +295,7 @@ public class MapActivity extends FragmentActivity implements
                                 (newLatitude * newLatitude + newLongitude * newLongitude);
                         Log.i("DIST POKE", dist + "");
                         return Math.abs(dist);
-                    }).anyMatch(e -> (e < 0.1));
+                    }).anyMatch(e -> (e < DEFAULT_TOO_CLOSE));
 
             ll = new LatLng(newLatitude, newLongitude);
         } while (estTropPres);
@@ -396,8 +404,8 @@ public class MapActivity extends FragmentActivity implements
         // Ajout des marqueurs pokémon
         computePokemonsOnMap(
                 mLocation,
-                10, // default : 3
-                0.01); // default : 0.006
+                DEFAULT_NUMBER_OF_POKEMONS_ON_MAP, // default : 3
+                DEFAULT_RANGE); // default : 0.006
 
         addAshOnMap(1.6);
         displayPokemonsOnMap(1.6);
@@ -412,7 +420,7 @@ public class MapActivity extends FragmentActivity implements
                 mLocation.getLatitude(),
                 mLocation.getLongitude()));
 
-        addPokemonsInAshArea(10, 0.8);
+        addPokemonsInAshArea(DEFAULT_NUMBER_OF_POKEMONS_ON_MAP, DEFAULT_RADIUS);
     }
 
     private void addPokemonsInAshArea(int nombre, double radius) {
@@ -432,7 +440,7 @@ public class MapActivity extends FragmentActivity implements
         computePokemonsOnMap(
                 mLocation,
                 nombre - pokemonsInArea, // default : 3
-                0.01); // default : 0.006
+                DEFAULT_RANGE); // default : 0.006
 
         // on rajoute les pokémon manquants dans la zone pour qu'elle ne soit pas vide
         for (int i = pokemonsInArea; i < nombre; i++) {
@@ -445,27 +453,46 @@ public class MapActivity extends FragmentActivity implements
     public boolean onMarkerClick(final Marker marker) {
         // Retrieve the data from the marker.
 
-        double dist =
-                marker.getPosition().latitude * marker.getPosition().latitude +
-                        marker.getPosition().longitude * marker.getPosition().longitude -
-                        (mLocation.getLatitude()*mLocation.getLatitude() +
-                                mLocation.getLongitude() * mLocation.getLongitude());
-        boolean isCloseEnoughToBeCatched = dist < 0.01;
+        Log.i("capture", "cliqué");
 
-        Log.i("Distance marker cliqué", dist+"");
+        if (!marker.equals(markerAsh)) {
+            double dist =
+                    marker.getPosition().latitude * marker.getPosition().latitude +
+                            marker.getPosition().longitude * marker.getPosition().longitude -
+                            (mLocation.getLatitude() * mLocation.getLatitude() +
+                                    mLocation.getLongitude() * mLocation.getLongitude());
+            boolean isCloseEnoughToBeCatched = Math.abs(dist) < DEFAULT_CATCHING_RANGE;
 
-        // pokémon capturé, une chance sur 2.
-        if(isCloseEnoughToBeCatched && Math.random()<0.5){
-            Map<String, Object> data = new HashMap<>();
-            data.put("nom", marker.getTitle());
-            data.put("date", Timestamp.now());
+            Log.i("capture", dist + "");
 
-            String userMail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            // pokémon capturé, une chance sur 2.
+            if (isCloseEnoughToBeCatched) {
+                if (Math.random() < 0.5) {
 
-            FirebaseFirestore.getInstance()
-                    .collection("users").document(userMail)
-                    .collection("pokemons")
-                    .add(data);
+                    Log.i("capture", "oui");
+
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("nom", marker.getTitle());
+                    data.put("date", Timestamp.now());
+
+                    GeoPoint place = new GeoPoint(marker.getPosition().latitude,
+                            marker.getPosition().longitude);
+                    data.put("lieu", place);
+
+                    String userMail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                    FirebaseFirestore.getInstance()
+                            .collection("users").document(userMail)
+                            .collection("pokemons")
+                            .add(data);
+                } else {
+                    locatedPokemons.remove(markerOfPokemons.get(marker));
+                    markerOfPokemons.remove(marker);
+                    marker.remove();
+                    marker.setVisible(false);
+                    Log.i("capture", "non");
+                }
+            }
         }
 
         // Return false to indicate that we have not consumed the event and that we wish
