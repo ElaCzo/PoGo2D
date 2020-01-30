@@ -66,9 +66,7 @@ public class CollectionActivity extends AppCompatActivity {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                for (String clePokemon : document.getData().keySet()) {
-
-                                    final String valPokemon = (String) document.getData().get(clePokemon);
+                                    final String valPokemon = (String) document.getData().get("nom");
 
                                     final StorageReference pokeRef = mStorageRef.child("pokemons/" + valPokemon + ".png");
 
@@ -92,7 +90,6 @@ public class CollectionActivity extends AppCompatActivity {
                                                             .notifyDataSetChanged();
                                                 }
                                             });
-                                }
                             }
 
                         } else {
