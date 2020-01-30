@@ -17,9 +17,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="70dp"
         android:layout_marginBottom="70dp"
+        android:scaleX="0.9"
+        android:scaleY="0.9"
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"
-        app:srcCompat="@drawable/titre"
+        app:srcCompat="@drawable/logo"
         android:contentDescription="@string/todo" />
 
     <EditText

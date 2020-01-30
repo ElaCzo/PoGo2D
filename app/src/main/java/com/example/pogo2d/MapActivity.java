@@ -1,19 +1,35 @@
 package com.example.pogo2d;
 
+import android.annotation.SuppressLint;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -22,15 +38,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
+
 
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 15;
@@ -43,8 +61,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private boolean mLocationPermissionGranted;
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
-    private Location mLastKnownLocation; /* Location android.Location.location à vérif sinon
-    suppr l'import et essayer un autre */
+    //private Location mLastKnownLocation;
+
+    private SettingsClient mSettingsClient;
+    private LocationCallback mLocationCallback;
+    private LocationRequest mLocationRequest;
+    private LocationSettingsRequest mLocationSettingsRequest;
+    private Location mLocation;
 
     private ArrayList<LocatedPokemon> locatedPokemons = new ArrayList<>();
 
@@ -65,6 +88,32 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+
+        mSettingsClient = LocationServices.getSettingsClient(this);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                Log.i(TAG, "ENTERED LocationCallback::onLocationResult");
+                super.onLocationResult(locationResult);
+                mLocation = locationResult.getLastLocation();
+                Log.i("Location1", mLocation.toString());
+            }
+        };
+
+        // set up the request. note that you can use setNumUpdates(1) and
+        // setInterval(0) to get one request.
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        mLocationSettingsRequest = builder.build();
+
+        startLocationUpdates();
     }
 
     private void getLocationPermission() {
@@ -84,6 +133,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -98,7 +148,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
             }
         }
-        //updateLocationUI();
+        updateLocationUI();
     }
 
 
@@ -121,6 +171,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap = googleMap;
 
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
+        /* à réactiver et moduler les dimensions des sprites en fonction du zoom */
+        mMap.getUiSettings().setZoomGesturesEnabled(false);
+        mMap.getUiSettings().setScrollGesturesEnabled(false);
+
+
+
         // Do other setup activities here too, as described elsewhere in this tutorial.
 
         // Turn on the My Location layer and the related control on the map.
@@ -129,6 +187,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
     }
+
 
     private void updateLocationUI() {
         if (mMap == null) {
@@ -141,7 +200,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             } else {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                mLastKnownLocation = null;
+                mLocation = null;
                 getLocationPermission();
             }
         } catch (SecurityException e) {
@@ -162,17 +221,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = (Location) task.getResult();
+                            mLocation = (Location) task.getResult();
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                    new LatLng(mLocation.getLatitude(),
+                                            mLocation.getLongitude()), DEFAULT_ZOOM));
 
                             // Ajout des marqueurs pokémon
-                            locatedPokemons = computePokemonsOnMap(mLastKnownLocation,
-                                    3,
-                                    0.006);
-
-                            Log.e("locate ", locatedPokemons.size() + "");
+                            locatedPokemons = computePokemonsOnMap(
+                                    mLocation,
+                                    10, // default : 3
+                                    0.01); // default : 0.006
 
                             addSashaOnMap(1.6);
                             addPokemonsOnMap(1.6);
@@ -201,21 +259,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         int nombrePokeExistants = Pokemon.getPokemons().size();
 
-
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-
         for (int i = 0; i < nombre; i++) {
             int alea = (int) (Math.random() * nombrePokeExistants);
             LatLng ll = computeRandomInRangeWhichDoesntAlreadyExist(range, points, location);
 
-            /*final double newLatitude = computeRandomInRange(latitude, range);
-            final double newLongitude = computeRandomInRange(longitude, range);
-
-            LatLng ll = new LatLng(newLatitude, newLongitude);*/
-
             points.add(ll);
-
             pokemons.add(new LocatedPokemon(
                     alea,
                     ll.latitude,
@@ -244,15 +292,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     .map(e -> {
                         double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
                                 (newLatitude * newLatitude + newLongitude * newLongitude);
-                        Log.i("DIST POKE", dist+"");
+                        Log.i("DIST POKE", dist + "");
                         return Math.abs(dist);
-                    }).anyMatch(e-> (e < 0.1));
+                    }).anyMatch(e -> (e < 0.1));
 
             ll = new LatLng(newLatitude, newLongitude);
         } while (estTropPres);
 
         return ll;
-
     }
 
 
@@ -292,8 +339,57 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(
-                        mLastKnownLocation.getLatitude(),
-                        mLastKnownLocation.getLongitude()))
+                        mLocation.getLatitude(),
+                        mLocation.getLongitude()))
                 .icon(BitmapDescriptorFactory.fromBitmap(imageSasha)));
+    }
+
+    private void startLocationUpdates() {
+        mSettingsClient
+                .checkLocationSettings(mLocationSettingsRequest)
+                .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                        Log.i(TAG, "Success: All location settings are met.");
+                        mFusedLocationProviderClient.requestLocationUpdates(
+                                mLocationRequest,
+                                mLocationCallback,
+                                Looper.myLooper()
+                        );
+                        if (mLocation == null) {
+                            Log.i(TAG, "mLocation WAS NULL");
+                        } else {
+                            //TODO/NOTE - this is never called
+                            Log.i("Location", mLocation.toString());
+
+                        }
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        int statusCode = ((ApiException) e).getStatusCode();
+                        switch (statusCode) {
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade " +
+                                        "location settings ");
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(), and check the
+                                    // result in onActivityResult().
+                                    ResolvableApiException rae = (ResolvableApiException) e;
+                                    int requestCheckSettings = 100;  //?
+                                    rae.startResolutionForResult(MapActivity.this, requestCheckSettings);
+                                } catch (IntentSender.SendIntentException sie) {
+                                    Log.i(TAG, "PendingIntent unable to execute request.");
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                String errorMessage = "Location settings are inadequate, and cannot be " +
+                                        "fixed here. Fix in Settings.";
+                                Log.e(TAG, errorMessage);
+                                Toast.makeText(MapActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                    }});
     }
 }
