@@ -11,7 +11,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 
-public class Sasha {
+public class Ash {
 
     private static File fichier;
 

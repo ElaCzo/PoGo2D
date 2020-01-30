@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Pokemon.init();
-        Sasha.init();
+        Ash.init();
 
         /* EditTexts */
         email = findViewById(R.id.email);

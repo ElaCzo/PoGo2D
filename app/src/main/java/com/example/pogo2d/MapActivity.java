@@ -69,7 +69,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     private ArrayList<LocatedPokemon> locatedPokemons = new ArrayList<>();
 
-    private Marker markerSasha;
+    private Marker markerAsh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +99,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 super.onLocationResult(locationResult);
                 mLocation = locationResult.getLastLocation();
                 updateMap();
+                // capture à faire ici
                 Log.i("Location1", mLocation.toString());
             }
         };
@@ -305,21 +306,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
-    private void addSashaOnMap(double scale) {
-        String cheminSasha = Sasha.getFichier().getAbsolutePath();
-        Bitmap imageSasha = BitmapFactory.decodeFile(cheminSasha);
+    private void addAshOnMap(double scale) {
+        String ashPath = Ash.getFichier().getAbsolutePath();
+        Bitmap ashImg = BitmapFactory.decodeFile(ashPath);
 
-        imageSasha = Bitmap
-                .createScaledBitmap(imageSasha,
-                        (int) (imageSasha.getWidth() * scale),
-                        (int) (imageSasha.getHeight() * scale),
+        ashImg = Bitmap
+                .createScaledBitmap(ashImg,
+                        (int) (ashImg.getWidth() * scale),
+                        (int) (ashImg.getHeight() * scale),
                         false);
 
-        markerSasha = mMap.addMarker(new MarkerOptions()
+        markerAsh = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(
                         mLocation.getLatitude(),
                         mLocation.getLongitude()))
-                .icon(BitmapDescriptorFactory.fromBitmap(imageSasha)));
+                .icon(BitmapDescriptorFactory.fromBitmap(ashImg)));
     }
 
     private void startLocationUpdates() {
@@ -385,7 +386,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 10, // default : 3
                 0.01); // default : 0.006
 
-        addSashaOnMap(1.6);
+        addAshOnMap(1.6);
         addPokemonsOnMap(1.6);
     }
 
@@ -394,9 +395,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 new LatLng(mLocation.getLatitude(),
                         mLocation.getLongitude()), DEFAULT_ZOOM));
 
-        markerSasha.setPosition(new LatLng(
+        markerAsh.setPosition(new LatLng(
                 mLocation.getLatitude(),
                 mLocation.getLongitude()));
 
+        addPokemonsInAshArea();
     }
 }
