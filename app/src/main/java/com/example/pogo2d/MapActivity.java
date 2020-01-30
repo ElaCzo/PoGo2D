@@ -481,13 +481,21 @@ public class MapActivity extends FragmentActivity implements
                             .collection("users").document(userMail)
                             .collection("pokemons")
                             .add(data);
+
+                    Toast.makeText(MapActivity.this,
+                            "Super ! "+marker.getTitle()+" a été capturé ! ",
+                            Toast.LENGTH_LONG);
                 } else {
-                    locatedPokemons.remove(markerOfPokemons.get(marker));
-                    markerOfPokemons.remove(marker);
-                    marker.remove();
-                    marker.setVisible(false);
                     Log.i("capture", "non");
+                    Toast.makeText(MapActivity.this,
+                            "Dommage, le Pokémon s'est échappé !",
+                            Toast.LENGTH_LONG);
                 }
+
+                locatedPokemons.remove(markerOfPokemons.get(marker));
+                markerOfPokemons.remove(marker);
+                marker.setVisible(false);
+                marker.remove();
             }
         }
 
