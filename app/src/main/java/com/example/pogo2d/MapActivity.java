@@ -60,7 +60,7 @@ public class MapActivity extends FragmentActivity implements
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 15;
     private static final int DEFAULT_NUMBER_OF_POKEMONS_ON_MAP = 10;
-    private static final double DEFAULT_RADIUS = 0.8;
+    private static final double DEFAULT_RADIUS = 1.5;
     private static final double DEFAULT_RANGE = 0.01;
     private static final double DEFAULT_TOO_CLOSE = 0.1;
     private static final double DEFAULT_CATCHING_RANGE = 0.08; // 0.08 default, 0.3 for debug
@@ -496,6 +496,11 @@ public class MapActivity extends FragmentActivity implements
                 markerOfPokemons.remove(marker);
                 marker.setVisible(false);
                 marker.remove();
+            }
+            else{
+                Toast.makeText(getApplicationContext(),
+                        "Tu es trop loin pour réussir à toucher ta cible !",
+                        Toast.LENGTH_LONG).show();
             }
         }
 
