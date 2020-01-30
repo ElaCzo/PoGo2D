@@ -60,10 +60,10 @@ public class MapActivity extends FragmentActivity implements
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 15;
     private static final int DEFAULT_NUMBER_OF_POKEMONS_ON_MAP = 10;
-    private static final double DEFAULT_RADIUS = 0.8; // 0.8 default
-    private static final double DEFAULT_RANGE = 0.01; // 0.01 default
+    private static final double DEFAULT_RADIUS = 0.8;
+    private static final double DEFAULT_RANGE = 0.01;
     private static final double DEFAULT_TOO_CLOSE = 0.1;
-    private static final double DEFAULT_CATCHING_RANGE = 0.08;
+    private static final double DEFAULT_CATCHING_RANGE = 0.08; // 0.08 default, 0.3 for debug
 
 
     private static final String TAG = MapActivity.class.getSimpleName();
@@ -482,14 +482,14 @@ public class MapActivity extends FragmentActivity implements
                             .collection("pokemons")
                             .add(data);
 
-                    Toast.makeText(MapActivity.this,
+                    Toast.makeText(getApplicationContext(),
                             "Super ! "+marker.getTitle()+" a été capturé ! ",
-                            Toast.LENGTH_LONG);
+                            Toast.LENGTH_LONG).show();
                 } else {
                     Log.i("capture", "non");
-                    Toast.makeText(MapActivity.this,
+                    Toast.makeText(getApplicationContext(),
                             "Dommage, le Pokémon s'est échappé !",
-                            Toast.LENGTH_LONG);
+                            Toast.LENGTH_LONG).show();
                 }
 
                 locatedPokemons.remove(markerOfPokemons.get(marker));
