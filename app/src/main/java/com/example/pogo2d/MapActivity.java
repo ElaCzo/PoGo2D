@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Parcel;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -399,6 +400,25 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 mLocation.getLatitude(),
                 mLocation.getLongitude()));
 
-        addPokemonsInAshArea();
+        addPokemonsInAshArea(5, 0.5);
+    }
+
+    private void addPokemonsInAshArea(int nombre, double radius){
+        int pokemonPresents=0;
+
+        int pokemonsInArea = locatedPokemons.stream()
+                .map(e -> {
+                    double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
+                            (mLocation.getLatitude() * mLocation.getLatitude() +
+                                    mLocation.getLongitude() * mLocation.getLongitude());
+                    Log.i("DIST POKE AREA ASH", dist + "");
+                    return (Math.abs(dist) < (radius*radius))?1:0;
+
+                }).reduce(0, (a1, a2) -> a1+a2);
+
+        // on rajoute les pokémon manquants dans la zone pour qu'elle ne soit pas vide
+        for(int i= pokemonPresents; i<nombre; i++){
+            addPokemonsOnMap(1.6);
+        }
     }
 }
