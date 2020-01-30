@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-import android.os.Parcel;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -45,6 +44,7 @@ import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -69,6 +69,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private Location mLocation;
 
     private ArrayList<LocatedPokemon> locatedPokemons = new ArrayList<>();
+    private HashMap<LocatedPokemon, Marker> markerOfPokemons = new HashMap<>();
 
     private Marker markerAsh;
 
@@ -230,34 +231,29 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
-    private ArrayList<LocatedPokemon> computePokemonsOnMap(
+    private void computePokemonsOnMap(
             Location location,
             int nombre,
             double range) {
 
         ArrayList<LocatedPokemon> pokemons = new ArrayList<>();
-        ArrayList<LatLng> points = new ArrayList<>();
 
         int nombrePokeExistants = Pokemon.getPokemons().size();
 
         for (int i = 0; i < nombre; i++) {
             int alea = (int) (Math.random() * nombrePokeExistants);
-            LatLng ll = computeRandomInRangeWhichDoesntAlreadyExist(range, points, location);
+            LatLng ll = computeRandomInRangeWhichDoesntAlreadyExist(range, location);
 
-            points.add(ll);
-            pokemons.add(new LocatedPokemon(
+            locatedPokemons.add(new LocatedPokemon(
                     alea,
                     ll.latitude,
                     ll.longitude));
         }
-
-        return pokemons;
     }
 
 
     private LatLng computeRandomInRangeWhichDoesntAlreadyExist(
             double range,
-            ArrayList<LatLng> points,
             Location location) {
 
         double latitude = location.getLatitude();
@@ -269,7 +265,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             final double newLatitude = computeRandomInRange(latitude, range);
             final double newLongitude = computeRandomInRange(longitude, range);
 
-            estTropPres = points.stream()
+            estTropPres = locatedPokemons.stream()
                     .map(e -> {
                         double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
                                 (newLatitude * newLatitude + newLongitude * newLongitude);
@@ -288,7 +284,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         return (n - range) + (Math.random() * (2. * range));
     }
 
-    private void addPokemonsOnMap(double scale) {
+    private void displayPokemonsOnMap(double scale) {
         for (LocatedPokemon p : locatedPokemons) {
             String cheminImageDuPokemon = p.getFichier().getAbsolutePath();
             Bitmap imageDuPokemon = BitmapFactory.decodeFile(cheminImageDuPokemon);
@@ -298,12 +294,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                             (int) (imageDuPokemon.getHeight() * scale),
                             false);
 
-            mMap.addMarker(new MarkerOptions()
-                    .title(p.getNom())
-                    .position(new LatLng(
-                            p.getLatitude(),
-                            p.getLongitude()))
-                    .icon(BitmapDescriptorFactory.fromBitmap(imageDuPokemon)));
+            if(!markerOfPokemons.containsKey(p)) {
+                markerOfPokemons.put(p, mMap.addMarker(new MarkerOptions()
+                        .title(p.getNom())
+                        .position(new LatLng(
+                                p.getLatitude(),
+                                p.getLongitude()))
+                        .icon(BitmapDescriptorFactory.fromBitmap(imageDuPokemon))));
+            }
         }
     }
 
@@ -382,13 +380,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         mLocation.getLongitude()), DEFAULT_ZOOM));
 
         // Ajout des marqueurs pokémon
-        locatedPokemons = computePokemonsOnMap(
+        computePokemonsOnMap(
                 mLocation,
                 10, // default : 3
                 0.01); // default : 0.006
 
         addAshOnMap(1.6);
-        addPokemonsOnMap(1.6);
+        displayPokemonsOnMap(1.6);
     }
 
     private void updateMap() {
@@ -400,10 +398,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 mLocation.getLatitude(),
                 mLocation.getLongitude()));
 
-        addPokemonsInAshArea(5, 0.5);
+        addPokemonsInAshArea(10, 0.8);
     }
 
-    private void addPokemonsInAshArea(int nombre, double radius){
+    private void addPokemonsInAshArea(int nombre, double radius) {
 
         int pokemonsInArea = locatedPokemons.stream()
                 .map(e -> {
@@ -411,23 +409,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                             (mLocation.getLatitude() * mLocation.getLatitude() +
                                     mLocation.getLongitude() * mLocation.getLongitude());
                     Log.i("DIST POKE AREA ASH", dist + "");
-                    return (Math.abs(dist) < (radius*radius))?1:0;
+                    return (Math.abs(dist) < (radius * radius)) ? 1 : 0;
 
-                }).reduce(0, (a1, a2) -> a1+a2);
+                }).reduce(0, (a1, a2) -> a1 + a2);
 
 
         // Ajout des marqueurs pokémon
-        ArrayList<LocatedPokemon> newPokemonsAdded = computePokemonsOnMap(
+        computePokemonsOnMap(
                 mLocation,
-                nombre-pokemonsInArea, // default : 3
+                nombre - pokemonsInArea, // default : 3
                 0.01); // default : 0.006
 
-        locatedPokemons.addAll(newPokemonsAdded);
-
         // on rajoute les pokémon manquants dans la zone pour qu'elle ne soit pas vide
-        for(int i= pokemonsInArea; i<nombre; i++){
-            // TODO !!! faire un update en fonction des marqueurs déjà présents !!
-            addPokemonsOnMap(1.6);
+        for (int i = pokemonsInArea; i < nombre; i++) {
+            displayPokemonsOnMap(1.6);
         }
     }
 }
