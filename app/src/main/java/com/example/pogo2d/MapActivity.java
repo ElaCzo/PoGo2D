@@ -1,6 +1,7 @@
 package com.example.pogo2d;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,11 +44,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
 import com.google.android.libraries.places.compat.Places;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapActivity extends FragmentActivity implements
+        OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
 
 
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -178,6 +187,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         /* à réactiver et moduler les dimensions des sprites en fonction du zoom */
         mMap.getUiSettings().setZoomGesturesEnabled(false);
         mMap.getUiSettings().setScrollGesturesEnabled(false);
+        mMap.setOnMarkerClickListener(this);
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
@@ -428,5 +438,39 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         for (int i = pokemonsInArea; i < nombre; i++) {
             displayPokemonsOnMap(1.6);
         }
+    }
+
+    /** Called when the user clicks a marker. */
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        // Retrieve the data from the marker.
+
+        double dist =
+                marker.getPosition().latitude * marker.getPosition().latitude +
+                        marker.getPosition().longitude * marker.getPosition().longitude -
+                        (mLocation.getLatitude()*mLocation.getLatitude() +
+                                mLocation.getLongitude() * mLocation.getLongitude());
+        boolean isCloseEnoughToBeCatched = dist < 0.01;
+
+        Log.i("Distance marker cliqué", dist+"");
+
+        // pokémon capturé, une chance sur 2.
+        if(isCloseEnoughToBeCatched && Math.random()<0.5){
+            Map<String, Object> data = new HashMap<>();
+            data.put("nom", marker.getTitle());
+            data.put("date", Timestamp.now());
+
+            String userMail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+            FirebaseFirestore.getInstance()
+                    .collection("users").document(userMail)
+                    .collection("pokemons")
+                    .add(data);
+        }
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur (which is for the camera to move such that the
+        // marker is centered and for the marker's info window to open, if it has one).
+        return true;
     }
 }
