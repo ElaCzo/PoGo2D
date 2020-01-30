@@ -1,7 +1,6 @@
 package com.example.pogo2d;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,7 +9,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -60,10 +58,10 @@ public class MapActivity extends FragmentActivity implements
 
 
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final int DEFAULT_ZOOM = 18;
+    private static final int DEFAULT_ZOOM = 15;
     private static final int DEFAULT_NUMBER_OF_POKEMONS_ON_MAP = 10;
-    private static final double DEFAULT_RADIUS = 0.8;
-    private static final double DEFAULT_RANGE = 0.01;
+    private static final double DEFAULT_RADIUS = 0.8; // 0.8 default
+    private static final double DEFAULT_RANGE = 0.01; // 0.01 default
     private static final double DEFAULT_TOO_CLOSE = 0.1;
     private static final double DEFAULT_CATCHING_RANGE = 0.08;
 
@@ -114,12 +112,9 @@ public class MapActivity extends FragmentActivity implements
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.i(TAG, "ENTERED LocationCallback::onLocationResult");
                 super.onLocationResult(locationResult);
                 mLocation = locationResult.getLastLocation();
                 updateMap();
-                // capture à faire ici
-                Log.i("Location1", mLocation.toString());
             }
         };
 
@@ -195,6 +190,7 @@ public class MapActivity extends FragmentActivity implements
         /* à réactiver et moduler les dimensions des sprites en fonction du zoom */
         mMap.getUiSettings().setZoomGesturesEnabled(false);
         mMap.getUiSettings().setScrollGesturesEnabled(false);
+
         mMap.setOnMarkerClickListener(this);
 
         // Turn on the My Location layer and the related control on the map.
@@ -293,7 +289,7 @@ public class MapActivity extends FragmentActivity implements
                     .map(e -> {
                         double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
                                 (newLatitude * newLatitude + newLongitude * newLongitude);
-                        Log.i("DIST POKE", dist + "");
+                        //Log.i("DIST POKE", dist + "");
                         return Math.abs(dist);
                     }).anyMatch(e -> (e < DEFAULT_TOO_CLOSE));
 
@@ -353,7 +349,7 @@ public class MapActivity extends FragmentActivity implements
                     @SuppressLint("MissingPermission")
                     @Override
                     public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                        Log.i(TAG, "Success: All location settings are met.");
+                        //Log.i(TAG, "Success: All location settings are met.");
                         mFusedLocationProviderClient.requestLocationUpdates(
                                 mLocationRequest,
                                 mLocationCallback,
@@ -430,7 +426,7 @@ public class MapActivity extends FragmentActivity implements
                     double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
                             (mLocation.getLatitude() * mLocation.getLatitude() +
                                     mLocation.getLongitude() * mLocation.getLongitude());
-                    Log.i("DIST POKE AREA ASH", dist + "");
+                    //Log.i("DIST POKE AREA ASH", dist + "");
                     return (Math.abs(dist) < (radius * radius)) ? 1 : 0;
 
                 }).reduce(0, (a1, a2) -> a1 + a2);
@@ -495,9 +491,6 @@ public class MapActivity extends FragmentActivity implements
             }
         }
 
-        // Return false to indicate that we have not consumed the event and that we wish
-        // for the default behavior to occur (which is for the camera to move such that the
-        // marker is centered and for the marker's info window to open, if it has one).
         return true;
     }
 }
