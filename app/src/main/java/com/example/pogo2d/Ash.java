@@ -16,11 +16,11 @@ public class Ash {
     private static File fichier;
 
     public static void init(){
-        StorageReference sashaRef = FirebaseStorage.getInstance().getReference()
-                .child("sasha/sasha.png");
-
         try {
             final File sashaFile = File.createTempFile("sasha", "png");
+
+            StorageReference sashaRef = FirebaseStorage.getInstance().getReference()
+                    .child("sasha/sasha.png");
 
             sashaRef.getFile(sashaFile)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {

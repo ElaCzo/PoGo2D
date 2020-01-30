@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Pokemon {
-    public static ArrayList<Pokemon> pokemons;
+    public static ArrayList<Pokemon> pokemons = new ArrayList<>();
     private String nom;
     private int num;
     private File fichier;
@@ -39,13 +39,12 @@ public class Pokemon {
     }
 
     public static void init() {
-        pokemons = initPokemons();
+        initPokemons();
     }
 
-    private static ArrayList<Pokemon> initPokemons() {
-        final ArrayList<Pokemon> res = new ArrayList<>();
+    private static void initPokemons() {
 
-        final Task<ListResult> task = FirebaseStorage.getInstance().getReference().child("pokemons")
+        final Task<ListResult> task = FirebaseStorage.getInstance().getReference().child("pokemons/")
                 .listAll()
                 .addOnSuccessListener(new OnSuccessListener<ListResult>() {
                     @Override
@@ -59,18 +58,19 @@ public class Pokemon {
                                             @Override
                                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                                 Log.i("Pokémon chargé", Pokemon.shapeNameFromStorage(item));
-                                                res.add(new Pokemon(
-                                                        res.size(),
+                                                pokemons.add(new Pokemon(
+                                                        pokemons.size(),
                                                         shapeNameFromStorage(item),
                                                         localFile));
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
-                                        Log.e("Pokemon ", "Erreur de téléchargement des pokémons");
+                                        Log.e("Pokemon", "Erreur de téléchargement des pokémons");
                                     }
                                 });
                             } catch (IOException e) {
+                                Log.e("Pokemon", "Erreur.");
                                 e.printStackTrace();
                             }
                         }
@@ -79,11 +79,14 @@ public class Pokemon {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("Pokemon", "Erreur accès Stroage");
+                        Log.e("Pokemon", "Erreur accès Storage");
                     }
                 });
+    }
 
-        return res;
+    public static String shapeNameFromStorage(StorageReference item) {
+        String nom = item.getName();
+        return (nom.charAt(0) + "").toUpperCase() + nom.substring(1, item.getName().length() - 4);
     }
 
     public String getNom() {
@@ -96,10 +99,5 @@ public class Pokemon {
 
     public File getFichier() {
         return fichier;
-    }
-
-    public static String shapeNameFromStorage(StorageReference item){
-        String nom = item.getName();
-        return (nom.charAt(0)+"").toUpperCase()+nom.substring(1, item.getName().length()-4);
     }
 }
