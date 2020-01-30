@@ -118,6 +118,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mLocationSettingsRequest = builder.build();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates();
+    }
+
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -338,9 +344,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         if (mLocation == null) {
                             Log.i(TAG, "mLocation WAS NULL");
                         } else {
-                            //TODO/NOTE - this is never called
                             Log.i("Location", mLocation.toString());
-
                         }
                     }
                 })
