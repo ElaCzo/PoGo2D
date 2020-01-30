@@ -6,19 +6,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -36,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -71,6 +69,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     private ArrayList<LocatedPokemon> locatedPokemons = new ArrayList<>();
 
+    private Marker markerSasha;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +98,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 Log.i(TAG, "ENTERED LocationCallback::onLocationResult");
                 super.onLocationResult(locationResult);
                 mLocation = locationResult.getLastLocation();
+                updateMap();
                 Log.i("Location1", mLocation.toString());
             }
         };
@@ -106,14 +107,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         // setInterval(0) to get one request.
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(1000);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         mLocationSettingsRequest = builder.build();
-
-        startLocationUpdates();
     }
 
     private void getLocationPermission() {
@@ -148,7 +147,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
             }
         }
-        updateLocationUI();
+        //updateLocationUI();
     }
 
 
@@ -163,12 +162,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        //mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap = googleMap;
 
         mMap.getUiSettings().setMapToolbarEnabled(false);
@@ -177,15 +170,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.getUiSettings().setZoomGesturesEnabled(false);
         mMap.getUiSettings().setScrollGesturesEnabled(false);
 
-
-
-        // Do other setup activities here too, as described elsewhere in this tutorial.
-
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+
+        startLocationUpdates();
     }
 
 
@@ -220,20 +211,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
                             mLocation = (Location) task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLocation.getLatitude(),
-                                            mLocation.getLongitude()), DEFAULT_ZOOM));
-
-                            // Ajout des marqueurs pokémon
-                            locatedPokemons = computePokemonsOnMap(
-                                    mLocation,
-                                    10, // default : 3
-                                    0.01); // default : 0.006
-
-                            addSashaOnMap(1.6);
-                            addPokemonsOnMap(1.6);
+                            initMap();
 
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -336,8 +315,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         (int) (imageSasha.getHeight() * scale),
                         false);
 
-
-        mMap.addMarker(new MarkerOptions()
+        markerSasha = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(
                         mLocation.getLatitude(),
                         mLocation.getLongitude()))
@@ -390,6 +368,35 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                                 Log.e(TAG, errorMessage);
                                 Toast.makeText(MapActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
-                    }});
+                    }
+                });
+    }
+
+    private void initMap() {
+
+        // Set the map's camera position to the current location of the device.
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(mLocation.getLatitude(),
+                        mLocation.getLongitude()), DEFAULT_ZOOM));
+
+        // Ajout des marqueurs pokémon
+        locatedPokemons = computePokemonsOnMap(
+                mLocation,
+                10, // default : 3
+                0.01); // default : 0.006
+
+        addSashaOnMap(1.6);
+        addPokemonsOnMap(1.6);
+    }
+
+    private void updateMap() {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(mLocation.getLatitude(),
+                        mLocation.getLongitude()), DEFAULT_ZOOM));
+
+        markerSasha.setPosition(new LatLng(
+                mLocation.getLatitude(),
+                mLocation.getLongitude()));
+
     }
 }
