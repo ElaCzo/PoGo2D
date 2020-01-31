@@ -20,9 +20,18 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.widget.Toast.LENGTH_LONG;
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Pokemon.init();
-        Ash.init();
 
         /* EditTexts */
         email = findViewById(R.id.email);
@@ -86,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
                 inscription.setVisibility(View.VISIBLE);
 
                 createAccount(email.getText().toString(), mdp.getText().toString());
+
+                Toast.makeText(
+                        MainActivity.this,
+                        "Inscription réussie ! \nCliquez sur Jouer",
+                        LENGTH_LONG).show();
             }
         });
     }
@@ -135,6 +146,12 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    public void switchToCollectionActivity(){
+        Toast.makeText(this, "Chargement terminé", LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+        startActivity(intent);
+    }
+
     private void signIn(String email, String password) {
         if (!validateForm()) {
             return;
@@ -147,36 +164,27 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, change activity
 
-                            Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
-                            startActivity(intent);
+                            FirebaseStorage.getInstance().getReference().child("pokemons/")
+                                    .listAll()
+                                    .addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                                        @Override
+                                        public void onSuccess(ListResult listResult) {
+
+                                            Toast.makeText(MainActivity.this,"Chargement en cours...", LENGTH_LONG).show();
+
+                                            Pokemon.init(listResult, 0, MainActivity.this);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("Pokemon", "Erreur accès Storage");
+                                        }
+                                    });
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    private void signOut() {
-    }
-
-    private void sendEmailVerification() {
-
-        // Send verification email
-        FirebaseAuth.getInstance().getCurrentUser().sendEmailVerification()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this,
-                                    "Verification email sent to " +
-                                            FirebaseAuth.getInstance().getCurrentUser().getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MainActivity.this,
-                                    "Failed to send verification email.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }

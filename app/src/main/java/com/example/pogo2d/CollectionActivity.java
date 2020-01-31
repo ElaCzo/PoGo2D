@@ -66,30 +66,34 @@ public class CollectionActivity extends AppCompatActivity {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                    final String valPokemon = (String) document.getData().get("nom");
+                                final String valPokemon = (String) document.getData().get("nom");
 
-                                    final StorageReference pokeRef = mStorageRef.child("pokemons/" + valPokemon + ".png");
+                                //final StorageReference pokeRef = mStorageRef.child("pokemons/" + valPokemon + ".png");
 
-                                    pokeRef.getBytes(1024 * 1024)
-                                            .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                                @Override
-                                                public void onSuccess(byte[] bytes) {
-                                                    Bitmap img = BitmapFactory
-                                                            .decodeByteArray(bytes,
-                                                                    0,
-                                                                    bytes.length);
-                                                    img = Bitmap
-                                                            .createScaledBitmap(img,
-                                                                    img.getWidth() * 3,
-                                                                    img.getHeight() * 3,
-                                                                    false);
-                                                    pkmnNames.add(valPokemon);
-                                                    pokeArrayList.add(img);
-                                                    ((CustomAdapter) gridView
-                                                            .getAdapter())
-                                                            .notifyDataSetChanged();
-                                                }
-                                            });
+                                /*pokeRef.getBytes(1024 * 1024)
+                                        .addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                            @Override
+                                            public void onSuccess(byte[] bytes) {*/
+                                Log.e("->Pokemon", valPokemon);
+                                                Bitmap img = BitmapFactory
+                                                        .decodeFile(Pokemon
+                                                                        .getPokemons()
+                                                                        .stream()
+                                                                        .filter(p -> p.getNom().equals(valPokemon))
+                                                                        .findFirst().get().getFichier().getAbsolutePath());
+                                                img = Bitmap
+                                                        .createScaledBitmap(img,
+                                                                img.getWidth() * 3,
+                                                                img.getHeight() * 3,
+                                                                false);
+                                                pkmnNames.add(valPokemon);
+                                                pokeArrayList.add(img);
+
+                                                ((CustomAdapter) gridView
+                                                        .getAdapter())
+                                                        .notifyDataSetChanged();
+                                            /*}
+                                        });*/
                             }
 
                         } else {
@@ -125,9 +129,9 @@ public class CollectionActivity extends AppCompatActivity {
                 return true;
 
             case R.id.logout_id:
-                    FirebaseAuth.getInstance().signOut();
-                    intent = new Intent(this, MainActivity.class);
-                    this.startActivity(intent);
+                FirebaseAuth.getInstance().signOut();
+                intent = new Intent(this, MainActivity.class);
+                this.startActivity(intent);
                 return true;
 
             default:

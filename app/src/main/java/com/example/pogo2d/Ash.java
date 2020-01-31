@@ -15,7 +15,7 @@ public class Ash {
 
     private static File fichier;
 
-    public static void init(){
+    public static void init(MainActivity mainActivity){
         try {
             final File sashaFile = File.createTempFile("sasha", "png");
 
@@ -27,6 +27,7 @@ public class Ash {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                             fichier = sashaFile;
+                            mainActivity.switchToCollectionActivity();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override

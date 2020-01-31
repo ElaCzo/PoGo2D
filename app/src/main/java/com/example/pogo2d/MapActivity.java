@@ -500,7 +500,7 @@ public class MapActivity extends FragmentActivity implements
             else{
                 Toast.makeText(getApplicationContext(),
                         "Tu es trop loin pour réussir à toucher ta cible !",
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         }
 
