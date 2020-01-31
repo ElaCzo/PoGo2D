@@ -63,7 +63,7 @@ public class MapActivity extends FragmentActivity implements
     private static final double DEFAULT_RADIUS = 1.5;
     private static final double DEFAULT_RANGE = 0.01;
     private static final double DEFAULT_TOO_CLOSE = 0.1;
-    private static final double DEFAULT_CATCHING_RANGE = 0.02; // 0.08 default, 0.3 for debug
+    private static final double DEFAULT_CATCHING_RANGE = 0.08; // 0.08 default, 0.3 for debug
 
 
     private static final String TAG = MapActivity.class.getSimpleName();
@@ -314,7 +314,7 @@ public class MapActivity extends FragmentActivity implements
                             (int) (imageDuPokemon.getHeight() * scale),
                             false);
 
-            if(!markerOfPokemons.containsKey(p)) {
+            if (!markerOfPokemons.containsKey(p)) {
                 markerOfPokemons.put(p, mMap.addMarker(new MarkerOptions()
                         .title(p.getNom())
                         .position(new LatLng(
@@ -411,7 +411,7 @@ public class MapActivity extends FragmentActivity implements
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(mLocation.getLatitude(),
                         mLocation.getLongitude()), DEFAULT_ZOOM));
-        if(markerAsh != null) {
+        if (markerAsh != null) {
             markerAsh.setPosition(new LatLng(
                     mLocation.getLatitude(),
                     mLocation.getLongitude()));
@@ -446,7 +446,9 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
-    /** Called when the user clicks a marker. */
+    /**
+     * Called when the user clicks a marker.
+     */
     @Override
     public boolean onMarkerClick(final Marker marker) {
         // Retrieve the data from the marker.
@@ -454,11 +456,13 @@ public class MapActivity extends FragmentActivity implements
         Log.i("capture", "cliqué");
 
         if (!marker.equals(markerAsh)) {
-            double dist =
-                    marker.getPosition().latitude * marker.getPosition().latitude +
-                            marker.getPosition().longitude * marker.getPosition().longitude -
-                            (mLocation.getLatitude() * mLocation.getLatitude() +
-                                    mLocation.getLongitude() * mLocation.getLongitude());
+            double dist = Math.pow(markerAsh.getPosition().latitude - marker.getPosition().latitude, 2)
+                    + Math.pow(markerAsh.getPosition().longitude - marker.getPosition().longitude, 2);
+//            double dist =
+//                    marker.getPosition().latitude * marker.getPosition().latitude +
+//                            marker.getPosition().longitude * marker.getPosition().longitude -
+//                            (mLocation.getLatitude() * mLocation.getLatitude() +
+//                                    mLocation.getLongitude() * mLocation.getLongitude());
             boolean isCloseEnoughToBeCatched = Math.abs(dist) < DEFAULT_CATCHING_RANGE;
 
             Log.i("capture", dist + "");
@@ -485,7 +489,7 @@ public class MapActivity extends FragmentActivity implements
                             .add(data);
 
                     Toast.makeText(getApplicationContext(),
-                            "Super ! "+marker.getTitle()+" a été capturé ! ",
+                            "Super ! " + marker.getTitle() + " a été capturé ! ",
                             Toast.LENGTH_LONG).show();
                 } else {
                     Log.i("capture", "non");
@@ -498,8 +502,7 @@ public class MapActivity extends FragmentActivity implements
                 markerOfPokemons.remove(marker);
                 marker.setVisible(false);
                 marker.remove();
-            }
-            else{
+            } else {
                 Toast.makeText(getApplicationContext(),
                         "Tu es trop loin pour réussir à toucher ta cible !",
                         Toast.LENGTH_SHORT).show();
