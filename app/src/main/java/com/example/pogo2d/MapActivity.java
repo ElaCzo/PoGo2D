@@ -411,11 +411,13 @@ public class MapActivity extends FragmentActivity implements
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(mLocation.getLatitude(),
                         mLocation.getLongitude()), DEFAULT_ZOOM));
-
-        markerAsh.setPosition(new LatLng(
-                mLocation.getLatitude(),
-                mLocation.getLongitude()));
-
+        if(markerAsh != null) {
+            markerAsh.setPosition(new LatLng(
+                    mLocation.getLatitude(),
+                    mLocation.getLongitude()));
+        } else {
+            addAshOnMap(1.6);
+        }
         addPokemonsInAshArea(DEFAULT_NUMBER_OF_POKEMONS_ON_MAP, DEFAULT_RADIUS);
     }
 

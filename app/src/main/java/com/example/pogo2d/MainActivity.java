@@ -167,8 +167,12 @@ public class MainActivity extends AppCompatActivity {
                                         public void onSuccess(ListResult listResult) {
 
                                             Toast.makeText(MainActivity.this,"Chargement en cours...", LENGTH_LONG).show();
+                                            if(Pokemon.getPokemons().size() == 0) {
+                                                Pokemon.init(listResult, 0, MainActivity.this);
+                                            } else {
+                                                Ash.init(MainActivity.this);
+                                            }
 
-                                            Pokemon.init(listResult, 0, MainActivity.this);
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {

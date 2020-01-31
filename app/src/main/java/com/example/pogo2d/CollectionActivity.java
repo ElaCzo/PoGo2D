@@ -23,6 +23,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class CollectionActivity extends AppCompatActivity {
 
@@ -67,23 +68,30 @@ public class CollectionActivity extends AppCompatActivity {
 
                                 final String valPokemon = (String) document.getData().get("nom");
 
-                                Bitmap img = BitmapFactory
-                                        .decodeFile(Pokemon
-                                                .getPokemons()
-                                                .stream()
-                                                .filter(p -> p.getNom().equals(valPokemon))
-                                                .findFirst().get().getFichier().getAbsolutePath());
-                                img = Bitmap
-                                        .createScaledBitmap(img,
-                                                img.getWidth() * 3,
-                                                img.getHeight() * 3,
-                                                false);
-                                pkmnNames.add(valPokemon);
-                                pokeArrayList.add(img);
 
-                                ((CustomAdapter) gridView
-                                        .getAdapter())
-                                        .notifyDataSetChanged();
+                                Optional<Pokemon> first = Pokemon
+                                        .getPokemons()
+                                        .stream()
+                                        .filter(p -> p.getNom().equals(valPokemon))
+                                        .findFirst();
+
+                                if(first.isPresent()) {
+                                    Bitmap img = BitmapFactory
+                                            .decodeFile(first.get().getFichier().getAbsolutePath());
+                                    img = Bitmap
+                                            .createScaledBitmap(img,
+                                                    img.getWidth() * 3,
+                                                    img.getHeight() * 3,
+                                                    false);
+                                    pkmnNames.add(valPokemon);
+                                    pokeArrayList.add(img);
+
+                                    ((CustomAdapter) gridView
+                                            .getAdapter())
+                                            .notifyDataSetChanged();
+                                } else {
+                                    Log.d("CollectionActivity", "Error getting pokemon: ", task.getException());
+                                }
                             }
 
                         } else {
