@@ -63,7 +63,7 @@ public class MapActivity extends FragmentActivity implements
     private static final double DEFAULT_RADIUS = 1.5;
     private static final double DEFAULT_RANGE = 0.01;
     private static final double DEFAULT_TOO_CLOSE = 0.1;
-    private static final double DEFAULT_CATCHING_RANGE = 0.08; // 0.08 default, 0.3 for debug
+    private static final double DEFAULT_CATCHING_RANGE = 0.02; // 0.08 default, 0.3 for debug
 
 
     private static final String TAG = MapActivity.class.getSimpleName();

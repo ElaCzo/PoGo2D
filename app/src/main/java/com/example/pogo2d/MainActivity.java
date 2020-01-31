@@ -62,14 +62,9 @@ public class MainActivity extends AppCompatActivity {
         jouer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                jouer.setEnabled(false);
+                inscription.setEnabled(false);
                 signIn(email.getText().toString(), mdp.getText().toString());
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-
-                } else {
-                    // No user is signed in
-                }
-
             }
         });
 
@@ -92,11 +87,6 @@ public class MainActivity extends AppCompatActivity {
                 inscription.setVisibility(View.VISIBLE);
 
                 createAccount(email.getText().toString(), mdp.getText().toString());
-
-                Toast.makeText(
-                        MainActivity.this,
-                        "Inscription réussie ! \nCliquez sur Jouer",
-                        LENGTH_LONG).show();
             }
         });
     }
@@ -130,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
+                                            Toast.makeText(
+                                                    MainActivity.this,
+                                                    "Inscription réussie ! \nCliquez sur Jouer",
+                                                    LENGTH_LONG).show();
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -149,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
     public void switchToCollectionActivity(){
         Toast.makeText(this, "Chargement terminé", LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+        jouer.setEnabled(true);
+        inscription.setEnabled(true);
         startActivity(intent);
     }
 

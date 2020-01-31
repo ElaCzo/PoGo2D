@@ -9,11 +9,11 @@
         android:icon="@drawable/map"
         android:title="@string/carte_title" />
 
-    <item
+    <!--<item
         android:id="@+id/pokedex_id"
         app:showAsAction="ifRoom"
         android:icon="@drawable/collection"
-        android:title="@string/pokedex_title" />
+        android:title="@string/pokedex_title" />-->
 
     <item
         android:id="@+id/logout_id"

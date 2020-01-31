@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -68,32 +67,23 @@ public class CollectionActivity extends AppCompatActivity {
 
                                 final String valPokemon = (String) document.getData().get("nom");
 
-                                //final StorageReference pokeRef = mStorageRef.child("pokemons/" + valPokemon + ".png");
+                                Bitmap img = BitmapFactory
+                                        .decodeFile(Pokemon
+                                                .getPokemons()
+                                                .stream()
+                                                .filter(p -> p.getNom().equals(valPokemon))
+                                                .findFirst().get().getFichier().getAbsolutePath());
+                                img = Bitmap
+                                        .createScaledBitmap(img,
+                                                img.getWidth() * 3,
+                                                img.getHeight() * 3,
+                                                false);
+                                pkmnNames.add(valPokemon);
+                                pokeArrayList.add(img);
 
-                                /*pokeRef.getBytes(1024 * 1024)
-                                        .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                            @Override
-                                            public void onSuccess(byte[] bytes) {*/
-                                Log.e("->Pokemon", valPokemon);
-                                                Bitmap img = BitmapFactory
-                                                        .decodeFile(Pokemon
-                                                                        .getPokemons()
-                                                                        .stream()
-                                                                        .filter(p -> p.getNom().equals(valPokemon))
-                                                                        .findFirst().get().getFichier().getAbsolutePath());
-                                                img = Bitmap
-                                                        .createScaledBitmap(img,
-                                                                img.getWidth() * 3,
-                                                                img.getHeight() * 3,
-                                                                false);
-                                                pkmnNames.add(valPokemon);
-                                                pokeArrayList.add(img);
-
-                                                ((CustomAdapter) gridView
-                                                        .getAdapter())
-                                                        .notifyDataSetChanged();
-                                            /*}
-                                        });*/
+                                ((CustomAdapter) gridView
+                                        .getAdapter())
+                                        .notifyDataSetChanged();
                             }
 
                         } else {
@@ -115,11 +105,11 @@ public class CollectionActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case R.id.pokedex_id:
+            /*case R.id.pokedex_id:
                 // User chose the "Settings" item, show the app settings UI...
                 intent = new Intent(this, CollectionActivity.class);
                 this.startActivity(intent);
-                return true;
+                return true;*/
 
             case R.id.carte_id:
                 // User chose the "Favorite" action, mark the current item
