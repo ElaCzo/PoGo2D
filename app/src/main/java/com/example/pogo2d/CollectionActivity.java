@@ -30,7 +30,7 @@ public class CollectionActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
     private FirebaseFirestore db;
 
-    private GridView gridView;
+    private static GridView gridView;
     private ArrayList<String> pkmnNames = new ArrayList<>();
     private ArrayList<Bitmap> pokeArrayList = new ArrayList();
     private Toolbar myToolbar;
@@ -138,5 +138,9 @@ public class CollectionActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    public static GridView getGridView(){
+        return gridView;
     }
 }

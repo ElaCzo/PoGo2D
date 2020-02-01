@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.GridView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +52,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -500,6 +502,10 @@ public class MapActivity extends FragmentActivity implements
                 markerOfPokemons.remove(marker);
                 marker.setVisible(false);
                 marker.remove();
+
+                ((CustomAdapter) CollectionActivity.getGridView()
+                        .getAdapter())
+                        .notifyDataSetChanged();
             } else {
                 Toast.makeText(getApplicationContext(),
                         "Tu es trop loin pour réussir à toucher ta cible !",
