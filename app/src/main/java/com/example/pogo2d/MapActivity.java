@@ -289,9 +289,12 @@ public class MapActivity extends FragmentActivity implements
 
             estTropPres = locatedPokemons.stream()
                     .map(e -> {
-                        double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
-                                (newLatitude * newLatitude + newLongitude * newLongitude);
-                        //Log.i("DIST POKE", dist + "");
+                        double dist = distanceBetween2Markers(
+                                e.getLatitude(),
+                                e.getLongitude(),
+                                newLatitude,
+                                newLongitude);
+
                         return Math.abs(dist);
                     }).anyMatch(e -> (e < DEFAULT_TOO_CLOSE));
 
@@ -427,9 +430,11 @@ public class MapActivity extends FragmentActivity implements
 
         int pokemonsInArea = locatedPokemons.stream()
                 .map(e -> {
-                    double dist = (e.latitude * e.latitude + e.longitude * e.longitude) -
-                            (mLocation.getLatitude() * mLocation.getLatitude() +
-                                    mLocation.getLongitude() * mLocation.getLongitude());
+                    double dist = distanceBetween2Markers(
+                            e.getLatitude(),
+                            e.getLongitude(),
+                            mLocation.getLatitude(),
+                            mLocation.getLongitude());
                     //Log.i("DIST POKE AREA ASH", dist + "");
                     return (Math.abs(dist) < (radius * radius)) ? 1 : 0;
 
@@ -458,8 +463,11 @@ public class MapActivity extends FragmentActivity implements
         Log.i("capture", "cliqué");
 
         if (!marker.equals(markerAsh)) {
-            double dist = distanceWithAPokemon(marker.getPosition().latitude,
-                    marker.getPosition().longitude);
+            double dist = distanceBetween2Markers(
+                    marker.getPosition().latitude,
+                    marker.getPosition().longitude,
+                    mLocation.getLatitude(),
+                    mLocation.getLongitude());
 
             boolean isCloseEnoughToBeCatched = Math.abs(dist) < DEFAULT_CATCHING_RANGE;
 
@@ -516,17 +524,22 @@ public class MapActivity extends FragmentActivity implements
         return true;
     }
 
-    private double distanceWithAPokemon(double lat1, double lon1) {
-        if ((lat1 == mLocation.getLatitude()) && (lon1 == mLocation.getLongitude())) {
+    private static double distanceBetween2Markers(
+            double lat1,
+            double lon1,
+            double lat2,
+            double lon2) {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
             return 0;
         }
         else {
-            double theta = lon1 - mLocation.getLongitude();
-            double dist = Math.sin(Math.toRadians(lat1)) *
-                    Math.sin(Math.toRadians(mLocation.getLatitude())) +
-                    Math.cos(Math.toRadians(lat1)) *
-                            Math.cos(Math.toRadians(mLocation.getLatitude())) *
-                            Math.cos(Math.toRadians(theta));
+            double theta = lon1 - lon2;
+            double dist = Math.sin(Math.toRadians(lat1))
+                    * Math.sin(Math.toRadians(lat2))
+                    + Math.cos(Math.toRadians(lat1)) *
+                    Math.cos(Math.toRadians(lat2)) *
+                    Math.cos(Math.toRadians(theta));
+
             dist = Math.acos(dist);
             dist = Math.toDegrees(dist);
             dist = dist * 60 * 1.1515;
