@@ -456,16 +456,14 @@ public class MapActivity extends FragmentActivity implements
         Log.i("capture", "cliqué");
 
         if (!marker.equals(markerAsh)) {
-            double dist = Math.pow(markerAsh.getPosition().latitude - marker.getPosition().latitude, 2)
-                    + Math.pow(markerAsh.getPosition().longitude - marker.getPosition().longitude, 2);
-//            double dist =
-//                    marker.getPosition().latitude * marker.getPosition().latitude +
-//                            marker.getPosition().longitude * marker.getPosition().longitude -
-//                            (mLocation.getLatitude() * mLocation.getLatitude() +
-//                                    mLocation.getLongitude() * mLocation.getLongitude());
+            double dist = distanceWithAPokemon(marker.getPosition().latitude,
+                    marker.getPosition().longitude);
+
             boolean isCloseEnoughToBeCatched = Math.abs(dist) < DEFAULT_CATCHING_RANGE;
 
-            Log.i("capture", dist + "");
+            Log.i("capture", dist +
+                    " Sasha:"+mLocation.getLatitude()+" "+mLocation.getLongitude()+
+                    " Pokémon:"+marker.getPosition().latitude+" "+marker.getPosition().longitude);
 
             // pokémon capturé, une chance sur 2.
             if (isCloseEnoughToBeCatched) {
@@ -510,5 +508,27 @@ public class MapActivity extends FragmentActivity implements
         }
 
         return true;
+    }
+
+    private double distanceWithAPokemon(double lat1, double lon1) {
+        if ((lat1 == mLocation.getLatitude()) && (lon1 == mLocation.getLongitude())) {
+            return 0;
+        }
+        else {
+            double theta = lon1 - mLocation.getLongitude();
+            double dist = Math.sin(Math.toRadians(lat1)) *
+                    Math.sin(Math.toRadians(mLocation.getLatitude())) +
+                    Math.cos(Math.toRadians(lat1)) *
+                            Math.cos(Math.toRadians(mLocation.getLatitude())) *
+                            Math.cos(Math.toRadians(theta));
+            dist = Math.acos(dist);
+            dist = Math.toDegrees(dist);
+            dist = dist * 60 * 1.1515;
+
+            // pour des kilomètres :
+            dist = dist * 1.609344;
+
+            return (dist);
+        }
     }
 }
