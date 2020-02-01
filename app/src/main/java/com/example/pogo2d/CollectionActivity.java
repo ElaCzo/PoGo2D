@@ -27,13 +27,36 @@ import java.util.Optional;
 
 public class CollectionActivity extends AppCompatActivity {
 
+    private static GridView gridView;
+    private static ArrayList<String> pkmnNames = new ArrayList<>();
+    private static ArrayList<Bitmap> pokeArrayList = new ArrayList();
     private StorageReference mStorageRef;
     private FirebaseFirestore db;
-
-    private static GridView gridView;
-    private ArrayList<String> pkmnNames = new ArrayList<>();
-    private ArrayList<Bitmap> pokeArrayList = new ArrayList();
     private Toolbar myToolbar;
+
+    public static GridView getGridView() {
+        return gridView;
+    }
+
+    public static void addPokemonToPokedex(String nom) {
+        Bitmap img = BitmapFactory
+                .decodeFile(Pokemon
+                        .getPokemonFromName()
+                        .get(Pokemon.shapeName(nom))
+                        .getFichier()
+                        .getAbsolutePath());
+        img = Bitmap
+                .createScaledBitmap(img,
+                        img.getWidth() * 3,
+                        img.getHeight() * 3,
+                        false);
+        pkmnNames.add(Pokemon.shapeName(nom));
+        pokeArrayList.add(img);
+
+        ((CustomAdapter) gridView
+                .getAdapter())
+                .notifyDataSetChanged();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +91,14 @@ public class CollectionActivity extends AppCompatActivity {
 
                                 final String valPokemon = (String) document.getData().get("nom");
 
-
                                 Optional<Pokemon> first = Pokemon
                                         .getPokemons()
                                         .stream()
-                                        .filter(p -> p.getNom().equals(valPokemon))
+                                        .filter(p -> Pokemon.shapeName(p.getNom())
+                                                .equals(Pokemon.shapeName(valPokemon)))
                                         .findFirst();
 
-                                if(first.isPresent()) {
+                                if (first.isPresent()) {
                                     Bitmap img = BitmapFactory
                                             .decodeFile(first.get().getFichier().getAbsolutePath());
                                     img = Bitmap
@@ -83,14 +106,16 @@ public class CollectionActivity extends AppCompatActivity {
                                                     img.getWidth() * 3,
                                                     img.getHeight() * 3,
                                                     false);
-                                    pkmnNames.add(valPokemon);
+                                    pkmnNames.add(Pokemon.shapeName(valPokemon));
                                     pokeArrayList.add(img);
 
                                     ((CustomAdapter) gridView
                                             .getAdapter())
                                             .notifyDataSetChanged();
                                 } else {
-                                    Log.d("CollectionActivity", "Error getting pokemon: ", task.getException());
+                                    Log.d("CollectionActivity",
+                                            "Error getting pokemon: " + valPokemon + " " + Pokemon.shapeName(valPokemon) + " ",
+                                            task.getException());
                                 }
                             }
 
@@ -127,6 +152,9 @@ public class CollectionActivity extends AppCompatActivity {
                 return true;
 
             case R.id.logout_id:
+                CollectionActivity.pokeArrayList = new ArrayList<>();
+                CollectionActivity.pkmnNames = new ArrayList<>();
+
                 FirebaseAuth.getInstance().signOut();
                 intent = new Intent(this, MainActivity.class);
                 this.startActivity(intent);
@@ -138,9 +166,5 @@ public class CollectionActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    public static GridView getGridView(){
-        return gridView;
     }
 }

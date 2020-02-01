@@ -9,7 +9,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,12 +46,10 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -62,7 +59,7 @@ public class MapActivity extends FragmentActivity implements
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 15;
     private static final int DEFAULT_NUMBER_OF_POKEMONS_ON_MAP = 10;
-    private static final double DEFAULT_RADIUS = 1.5;
+    private static final double DEFAULT_RADIUS = 0.6;//1.5;
     private static final double DEFAULT_RANGE = 0.01;
     private static final double DEFAULT_TOO_CLOSE = 0.1;
     private static final double DEFAULT_CATCHING_RANGE = 0.08; // 0.08 default, 0.3 for debug
@@ -90,6 +87,32 @@ public class MapActivity extends FragmentActivity implements
 
     private Marker markerAsh;
 
+    private static double distanceBetween2Markers(
+            double lat1,
+            double lon1,
+            double lat2,
+            double lon2) {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
+            return 0;
+        } else {
+            double theta = lon1 - lon2;
+            double dist = Math.sin(Math.toRadians(lat1))
+                    * Math.sin(Math.toRadians(lat2))
+                    + Math.cos(Math.toRadians(lat1)) *
+                    Math.cos(Math.toRadians(lat2)) *
+                    Math.cos(Math.toRadians(theta));
+
+            dist = Math.acos(dist);
+            dist = Math.toDegrees(dist);
+            dist = dist * 60 * 1.1515;
+
+            // pour des kilomètres :
+            dist = dist * 1.609344;
+
+            return (dist);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,8 +138,15 @@ public class MapActivity extends FragmentActivity implements
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                mLocation = locationResult.getLastLocation();
-                updateMap();
+
+                if (locationResult != null) {
+                    mLocation = locationResult.getLastLocation();
+                    Log.d("location", "not null");
+                    updateMap();
+                }
+                else {
+                    Log.d("location", "null");
+                }
             }
         };
 
@@ -155,7 +185,6 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -172,7 +201,6 @@ public class MapActivity extends FragmentActivity implements
         }
         //updateLocationUI();
     }
-
 
     /**
      * Manipulates the map once available.
@@ -203,7 +231,6 @@ public class MapActivity extends FragmentActivity implements
 
         startLocationUpdates();
     }
-
 
     private void updateLocationUI() {
         if (mMap == null) {
@@ -273,7 +300,6 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
-
     private LatLng computeRandomInRangeWhichDoesntAlreadyExist(
             double range,
             Location location) {
@@ -303,7 +329,6 @@ public class MapActivity extends FragmentActivity implements
 
         return ll;
     }
-
 
     private double computeRandomInRange(double n, double range) {
         return (n - range) + (Math.random() * (2. * range));
@@ -472,12 +497,15 @@ public class MapActivity extends FragmentActivity implements
             boolean isCloseEnoughToBeCatched = Math.abs(dist) < DEFAULT_CATCHING_RANGE;
 
             Log.i("capture", dist +
-                    " Sasha:"+mLocation.getLatitude()+" "+mLocation.getLongitude()+
-                    " Pokémon:"+marker.getPosition().latitude+" "+marker.getPosition().longitude);
+                    " Sasha:" + mLocation.getLatitude() + " " + mLocation.getLongitude() +
+                    " Pokémon:" + marker.getPosition().latitude + " " + marker.getPosition().longitude);
 
             // pokémon capturé, une chance sur 2.
             if (isCloseEnoughToBeCatched) {
+                // est capturé
                 if (Math.random() < 0.5) {
+
+                    CollectionActivity.addPokemonToPokedex(marker.getTitle());
 
                     Log.i("capture", "oui");
 
@@ -499,7 +527,9 @@ public class MapActivity extends FragmentActivity implements
                     Toast.makeText(getApplicationContext(),
                             "Super ! " + marker.getTitle() + " a été capturé ! ",
                             Toast.LENGTH_LONG).show();
-                } else {
+                }
+                // n'est pas capturé
+                else {
                     Log.i("capture", "non");
                     Toast.makeText(getApplicationContext(),
                             "Dommage, le Pokémon s'est échappé !",
@@ -522,32 +552,5 @@ public class MapActivity extends FragmentActivity implements
         }
 
         return true;
-    }
-
-    private static double distanceBetween2Markers(
-            double lat1,
-            double lon1,
-            double lat2,
-            double lon2) {
-        if ((lat1 == lat2) && (lon1 == lon2)) {
-            return 0;
-        }
-        else {
-            double theta = lon1 - lon2;
-            double dist = Math.sin(Math.toRadians(lat1))
-                    * Math.sin(Math.toRadians(lat2))
-                    + Math.cos(Math.toRadians(lat1)) *
-                    Math.cos(Math.toRadians(lat2)) *
-                    Math.cos(Math.toRadians(theta));
-
-            dist = Math.acos(dist);
-            dist = Math.toDegrees(dist);
-            dist = dist * 60 * 1.1515;
-
-            // pour des kilomètres :
-            dist = dist * 1.609344;
-
-            return (dist);
-        }
     }
 }
