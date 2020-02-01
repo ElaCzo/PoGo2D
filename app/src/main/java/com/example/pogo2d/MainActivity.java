@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
         jouer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jouer.setEnabled(false);
-                inscription.setEnabled(false);
                 signIn(email.getText().toString(), mdp.getText().toString());
             }
         });
@@ -158,14 +156,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, change activity
+
+                            jouer.setEnabled(false);
+                            inscription.setEnabled(false);
 
                             FirebaseStorage.getInstance().getReference().child("pokemons/")
                                     .listAll()
                                     .addOnSuccessListener(new OnSuccessListener<ListResult>() {
                                         @Override
                                         public void onSuccess(ListResult listResult) {
-
                                             Toast.makeText(MainActivity.this,"Chargement en cours...", LENGTH_LONG).show();
                                             if(Pokemon.getPokemons().size() == 0) {
                                                 Pokemon.init(listResult, 0, MainActivity.this);

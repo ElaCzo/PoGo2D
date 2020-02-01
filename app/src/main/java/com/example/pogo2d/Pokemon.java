@@ -74,6 +74,7 @@ public class Pokemon {
                                         Pokemon.getPokemons().size(),
                                         Pokemon.shapeNameFromStorage(item),
                                         localFile));
+                                Log.e("Pokemon", Pokemon.shapeNameFromStorage(item));
 
                                 init(lr, i + 1, mainActivity);
                             }
