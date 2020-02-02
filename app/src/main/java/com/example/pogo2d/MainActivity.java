@@ -130,9 +130,14 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            if (password.length() < 6) {
+                                Toast.makeText(MainActivity.this, "Password must be at least 6 characters long.",
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Toast.makeText(MainActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 });

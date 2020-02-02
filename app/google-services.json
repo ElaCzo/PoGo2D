@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "780487816738-j9q4cvi808uce7q1ivcn84msqi34hq3l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pogo2d",
+            "certificate_hash": "7fae61432ef677811ff5e1d11e1989086110d525"
+          }
+        },
+        {
           "client_id": "780487816738-133crk9sf5ggebem5otpds7crtksniem.apps.googleusercontent.com",
           "client_type": 3
         }
