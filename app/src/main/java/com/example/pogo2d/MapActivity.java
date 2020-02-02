@@ -59,10 +59,10 @@ public class MapActivity extends FragmentActivity implements
     public final static int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 15;
     private static final int DEFAULT_NUMBER_OF_POKEMONS_ON_MAP = 10;
-    private static final double DEFAULT_RADIUS = 0.6;//1.5;
+    private static final double DEFAULT_RADIUS = 1.5;
     private static final double DEFAULT_RANGE = 0.01;
     private static final double DEFAULT_TOO_CLOSE = 0.1;
-    private static final double DEFAULT_CATCHING_RANGE = 0.08; // 0.08 default, 0.3 for debug
+    private static final double DEFAULT_CATCHING_RANGE = 0.11; // 0.08 default, for tests/presentation : 0.11
 
 
     private static final String TAG = MapActivity.class.getSimpleName();

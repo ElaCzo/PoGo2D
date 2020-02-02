@@ -91,31 +91,33 @@ public class CollectionActivity extends AppCompatActivity {
 
                                 final String valPokemon = (String) document.getData().get("nom");
 
-                                Optional<Pokemon> first = Pokemon
-                                        .getPokemons()
-                                        .stream()
-                                        .filter(p -> Pokemon.shapeName(p.getNom())
-                                                .equals(Pokemon.shapeName(valPokemon)))
-                                        .findFirst();
+                                if(valPokemon!=null) {
+                                    Optional<Pokemon> first = Pokemon
+                                            .getPokemons()
+                                            .stream()
+                                            .filter(p -> Pokemon.shapeName(p.getNom())
+                                                    .equals(Pokemon.shapeName(valPokemon)))
+                                            .findFirst();
 
-                                if (first.isPresent()) {
-                                    Bitmap img = BitmapFactory
-                                            .decodeFile(first.get().getFichier().getAbsolutePath());
-                                    img = Bitmap
-                                            .createScaledBitmap(img,
-                                                    img.getWidth() * 3,
-                                                    img.getHeight() * 3,
-                                                    false);
-                                    pkmnNames.add(Pokemon.shapeName(valPokemon));
-                                    pokeArrayList.add(img);
+                                    if (first.isPresent()) {
+                                        Bitmap img = BitmapFactory
+                                                .decodeFile(first.get().getFichier().getAbsolutePath());
+                                        img = Bitmap
+                                                .createScaledBitmap(img,
+                                                        img.getWidth() * 3,
+                                                        img.getHeight() * 3,
+                                                        false);
+                                        pkmnNames.add(Pokemon.shapeName(valPokemon));
+                                        pokeArrayList.add(img);
 
-                                    ((CustomAdapter) gridView
-                                            .getAdapter())
-                                            .notifyDataSetChanged();
-                                } else {
-                                    Log.d("CollectionActivity",
-                                            "Error getting pokemon: " + valPokemon + " " + Pokemon.shapeName(valPokemon) + " ",
-                                            task.getException());
+                                        ((CustomAdapter) gridView
+                                                .getAdapter())
+                                                .notifyDataSetChanged();
+                                    } else {
+                                        Log.d("CollectionActivity",
+                                                "Error getting pokemon: " + valPokemon + " " + Pokemon.shapeName(valPokemon) + " ",
+                                                task.getException());
+                                    }
                                 }
                             }
 
